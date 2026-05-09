@@ -7,37 +7,57 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { CheckoutProvider, CheckoutSummary } from "@/contexts/CheckoutContext";
+import { useTenantConfig } from "@/contexts/TenantContext";
 import { POLICY_LINKS } from "@/lib/constants/policies";
-import { getStoreName } from "@/lib/store";
+import {
+  resolveTenantBranding,
+  resolveTenantFooter,
+  resolveTenantNavigation,
+} from "@/lib/tenant";
 import { extractBasePath } from "@/lib/utils/path";
-
-const storeName = getStoreName();
 
 function CheckoutHeader() {
   const pathname = usePathname();
   const basePath = extractBasePath(pathname);
   const t = useTranslations("checkoutLayout");
+  const tenantConfig = useTenantConfig();
+  const branding = resolveTenantBranding(tenantConfig, {
+    name: tenantConfig.storeName ?? "Store",
+    logoUrl: "/spree.png",
+  });
+  const navigation = resolveTenantNavigation(tenantConfig);
 
   return (
     <header className="flex items-center justify-between">
       <Link href={basePath || "/"} className="flex items-center space-x-2">
         <Image
-          src="/spree.png"
-          alt={storeName}
+          src={branding.logoUrl ?? "/spree.png"}
+          alt={branding.name ?? tenantConfig.storeName ?? "Store"}
           width={90}
           height={32}
           fetchPriority="high"
           loading="eager"
         />
       </Link>
-      <Link
-        href={basePath || "/"}
-        className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
-        aria-label={t("backToStore")}
-      >
-        <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-        <span className="hidden sm:inline">{t("backToStore")}</span>
-      </Link>
+      <div className="flex items-center gap-4">
+        {navigation.checkoutLinks.length > 0 && (
+          <nav className="hidden md:flex items-center gap-4 text-sm text-gray-600">
+            {navigation.checkoutLinks.map((link) => (
+              <Link key={link.href} href={link.href}>
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        )}
+        <Link
+          href={basePath || "/"}
+          className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
+          aria-label={t("backToStore")}
+        >
+          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+          <span className="hidden sm:inline">{t("backToStore")}</span>
+        </Link>
+      </div>
     </header>
   );
 }
@@ -47,22 +67,37 @@ function CheckoutFooter() {
   const basePath = extractBasePath(pathname);
   const t = useTranslations("checkoutLayout");
   const tp = useTranslations("policies");
+  const tenantConfig = useTenantConfig();
+  const branding = resolveTenantBranding(tenantConfig, {
+    name: tenantConfig.storeName ?? "Store",
+  });
+  const footerConfig = resolveTenantFooter(tenantConfig, {
+    policyLinks: POLICY_LINKS.map((policy) => ({
+      label: tp(policy.nameKey),
+      href: `${basePath}/policies/${policy.slug}`,
+    })),
+    showPolicies: true,
+  });
 
   return (
     <footer className="py-4 text-xs text-gray-500 border-t border-gray-200 mt-auto flex flex-wrap items-center gap-x-3 gap-y-1">
       <p>
-        {t("allRightsReserved", { year: new Date().getFullYear(), storeName })}
+        {t("allRightsReserved", {
+          year: new Date().getFullYear(),
+          storeName: branding.name ?? tenantConfig.storeName ?? "Store",
+        })}
       </p>
-      {POLICY_LINKS.map((policy) => (
-        <Link
-          key={policy.slug}
-          href={`${basePath}/policies/${policy.slug}`}
-          target="_blank"
-          className="text-gray-500 underline hover:text-gray-700"
-        >
-          {tp(policy.nameKey)}
-        </Link>
-      ))}
+      {footerConfig.showPolicies &&
+        footerConfig.policyLinks.map((policy) => (
+          <Link
+            key={policy.href}
+            href={policy.href}
+            target="_blank"
+            className="text-gray-500 underline hover:text-gray-700"
+          >
+            {policy.label}
+          </Link>
+        ))}
     </footer>
   );
 }
@@ -103,9 +138,18 @@ interface CheckoutLayoutProps {
 
 function CheckoutLayoutContent({ children }: CheckoutLayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div
+      className="min-h-screen flex flex-col"
+      style={{
+        background: "var(--color-background)",
+        color: "var(--color-text)",
+      }}
+    >
       {/* Mobile header */}
-      <div className="lg:hidden border-b border-gray-200">
+      <div
+        className="lg:hidden border-b"
+        style={{ borderColor: "var(--color-border)" }}
+      >
         <div className="px-5">
           <CheckoutHeader />
         </div>
@@ -131,7 +175,13 @@ function CheckoutLayoutContent({ children }: CheckoutLayoutProps) {
         </div>
 
         {/* Desktop summary sidebar — Shopify: light gray bg with left border */}
-        <div className="hidden lg:block lg:col-start-3 border-l border-gray-200 bg-gray-50">
+        <div
+          className="hidden lg:block lg:col-start-3 border-l"
+          style={{
+            borderColor: "var(--color-border)",
+            background: "var(--color-surface)",
+          }}
+        >
           <div className="sticky top-0 px-10 py-10">
             <CheckoutSummary />
           </div>

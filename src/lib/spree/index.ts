@@ -2,7 +2,14 @@
 
 // Auth helpers (token refresh, cookie-based auth)
 export { getAuthOptions, withAuthRefresh } from "./auth-helpers";
-export { getClient, getConfig, initSpreeNext } from "./config";
+export {
+  getClient,
+  getClientForConfig,
+  getConfig,
+  getSpreeCacheScope,
+  initSpreeNext,
+  resolveSpreeConfig,
+} from "./config";
 // Cookie management
 export {
   clearAccessToken,

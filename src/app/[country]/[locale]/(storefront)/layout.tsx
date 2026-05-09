@@ -1,8 +1,10 @@
 import type { Category } from "@spree/sdk";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { getCategories } from "@/lib/data/categories";
+import { getTenantConfigByHost } from "@/lib/tenant";
 
 interface StorefrontLayoutProps {
   children: React.ReactNode;
@@ -38,6 +40,12 @@ export default async function StorefrontLayout({
 }: StorefrontLayoutProps) {
   const { country, locale } = await params;
   const basePath = `/${country}/${locale}`;
+  const requestHeaders = await headers();
+  const tenantHost =
+    requestHeaders.get("x-forwarded-host") ??
+    requestHeaders.get("host") ??
+    "localhost";
+  const tenantConfig = await getTenantConfigByHost(tenantHost);
 
   const rootCategories = await getCategories({
     depth_eq: 0,
@@ -55,6 +63,7 @@ export default async function StorefrontLayout({
         rootCategories={rootCategories}
         basePath={basePath}
         locale={locale as Locale}
+        tenantConfig={tenantConfig}
       />
       {rootCategories.length > 0 && (
         <nav aria-label="Category navigation" className="sr-only">
@@ -66,6 +75,7 @@ export default async function StorefrontLayout({
         rootCategories={rootCategories}
         basePath={basePath}
         locale={locale as Locale}
+        tenantConfig={tenantConfig}
       />
     </>
   );
