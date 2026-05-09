@@ -5,19 +5,32 @@ import {
   getStoreSeoTitle,
   getStoreUrl,
 } from "@/lib/store";
+import type { TenantConfig } from "@/lib/tenant";
+import { getTenantConfigFromRequest } from "@/lib/tenant/request";
+import {
+  getTenantBrandName,
+  getTenantDescription,
+  getTenantSiteUrl,
+} from "@/lib/tenant/surface";
 
 interface HomeMetadataParams {
   country: string;
   locale: string;
+  tenantConfig?: TenantConfig | null;
 }
 
 export async function generateHomeMetadata({
   country,
   locale,
+  tenantConfig,
 }: HomeMetadataParams): Promise<Metadata> {
-  const storeName = getStoreSeoTitle();
-  const description = getStoreMetaDescription();
-  const storeUrl = getStoreUrl();
+  const resolvedTenantConfig =
+    tenantConfig ?? (await getTenantConfigFromRequest());
+  const storeName =
+    getTenantBrandName(resolvedTenantConfig) ?? getStoreSeoTitle();
+  const description =
+    getTenantDescription(resolvedTenantConfig) ?? getStoreMetaDescription();
+  const storeUrl = getTenantSiteUrl(resolvedTenantConfig) ?? getStoreUrl();
   const canonicalUrl = storeUrl
     ? buildCanonicalUrl(storeUrl, `/${country}/${locale}`)
     : undefined;

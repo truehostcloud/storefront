@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "sections": [
+    {
+      "type": "hero",
+      "badge": "New season arrivals",
+      "title": "{{storeName}} curated for modern living",
+      "description": "Build a bold first impression with a homepage that highlights your brand story, elevates your best products, and guides shoppers naturally toward conversion.",
+      "alignment": "left",
+      "actionsLayout": "row",
+      "primaryAction": {
+        "label": "Shop Collection",
+        "href": "/products",
+        "variant": "default",
+        "icon": "arrow-right"
+      },
+      "secondaryAction": {
+        "label": "Explore Story",
+        "href": "/products",
+        "variant": "outline",
+        "icon": "play"
+      },
+      "stats": [
+        {
+          "value": "50k+",
+          "label": "Happy customers"
+        },
+        {
+          "value": "4.9/5",
+          "label": "Average rating"
+        },
+        {
+          "value": "120+",
+          "label": "Curated drops"
+        }
+      ],
+      "media": {
+        "imageUrl": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&q=80&w=1200",
+        "alt": "Modern fashion arrangement",
+        "floatingBadgeTitle": "Just shipped",
+        "floatingBadgeLabel": "To Los Angeles, CA",
+        "secondaryBadgeTitle": "Premium",
+        "secondaryBadgeLabel": "Quality selected"
+      },
+      "theme": {
+        "background": "#fffaf5",
+        "foreground": "#111827",
+        "accent": "#f97316",
+        "mutedForeground": "#6b7280",
+        "cardBackground": "#ffffff",
+        "borderColor": "#fed7aa"
+      }
+    },
+    {
+      "type": "features",
+      "title": "Made to convert attention into action",
+      "description": "Use configurable blocks to spotlight what matters most to each tenant without rewriting the page.",
+      "items": [
+        {
+          "title": "Rich visual storytelling",
+          "description": "Highlight branded imagery, campaign copy, and product moments in a layout that feels uniquely yours.",
+          "icon": "sparkles"
+        },
+        {
+          "title": "Fast fulfillment messaging",
+          "description": "Promote delivery promises and merchandising hooks exactly where they have the most impact.",
+          "icon": "truck"
+        },
+        {
+          "title": "Trust at every step",
+          "description": "Surface ratings, guarantees, and support cues to help shoppers buy with confidence.",
+          "icon": "shield"
+        }
+      ],
+      "theme": {
+        "background": "#ffffff",
+        "foreground": "#111827",
+        "mutedForeground": "#6b7280",
+        "cardBackground": "#ffffff",
+        "borderColor": "#e5e7eb",
+        "accent": "#2563eb"
+      }
+    },
+    {
+      "type": "featured-products",
+      "title": "Featured products",
+      "description": "Showcase the products that define this store right now — trending, seasonal, or simply impossible to ignore.",
+      "cta": {
+        "label": "View all products",
+        "href": "/products",
+        "variant": "outline",
+        "icon": "arrow-right"
+      },
+      "theme": {
+        "background": "#f8fafc",
+        "foreground": "#0f172a",
+        "mutedForeground": "#64748b",
+        "accent": "#0f172a",
+        "borderColor": "#cbd5e1"
+      }
+    }
+  ]
+}

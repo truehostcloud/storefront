@@ -1,5 +1,14 @@
 import type { Category, Media, Product } from "@spree/sdk";
 import { ensureProtocol, getStoreName, getStoreUrl } from "@/lib/store";
+import type { TenantConfig } from "@/lib/tenant";
+import {
+  getTenantBrandName,
+  getTenantDescription,
+  getTenantLogoUrl,
+  getTenantSiteUrl,
+  getTenantSocialLinks,
+  getTenantTwitterHandle,
+} from "@/lib/tenant/surface";
 
 /**
  * Default social image path (stored in public/).
@@ -128,14 +137,22 @@ export function buildBreadcrumbJsonLd(
  * Build JSON-LD Organization schema from environment variables.
  * https://schema.org/Organization
  */
-export function buildOrganizationJsonLd(): Record<string, unknown> {
-  const storeName = getStoreName();
-  const storeUrl = getStoreUrl();
-  const logoUrl = process.env.STORE_LOGO_URL;
+export function buildOrganizationJsonLd(
+  tenantConfig?: TenantConfig | null,
+): Record<string, unknown> {
+  const storeName =
+    getTenantBrandName(tenantConfig) ?? getStoreName() ?? "Store";
+  const storeUrl = getTenantSiteUrl(tenantConfig) ?? getStoreUrl();
+  const logoUrl = getTenantLogoUrl(tenantConfig) ?? process.env.STORE_LOGO_URL;
+  const twitter =
+    getTenantTwitterHandle(tenantConfig) ?? process.env.STORE_TWITTER;
+  const socialLinks = getTenantSocialLinks(tenantConfig);
   const facebook = process.env.STORE_FACEBOOK;
-  const twitter = process.env.STORE_TWITTER;
   const instagram = process.env.STORE_INSTAGRAM;
-  const supportEmail = process.env.STORE_SUPPORT_EMAIL;
+  const supportEmail =
+    getTenantDescription(tenantConfig) && process.env.STORE_SUPPORT_EMAIL
+      ? process.env.STORE_SUPPORT_EMAIL
+      : process.env.STORE_SUPPORT_EMAIL;
 
   const schema: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -148,7 +165,7 @@ export function buildOrganizationJsonLd(): Record<string, unknown> {
     schema.logo = logoUrl;
   }
 
-  const sameAs: string[] = [];
+  const sameAs: string[] = [...socialLinks];
   if (facebook) sameAs.push(facebook);
   if (twitter) {
     sameAs.push(

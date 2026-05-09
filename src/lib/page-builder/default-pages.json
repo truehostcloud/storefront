@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "pages": [
+    {
+      "slug": "about/brand-story",
+      "title": "About {{storeName}}",
+      "description": "Learn the story behind {{storeName}} and the values that shape every collection.",
+      "seo": {
+        "title": "About {{storeName}}",
+        "description": "Discover the story, mission, and point of view behind {{storeName}}."
+      },
+      "sections": [
+        {
+          "type": "hero",
+          "badge": "Brand story",
+          "title": "A distinct page built at runtime",
+          "description": "This page is rendered from configuration only. Change the slug, blocks, text, buttons, and visuals without creating a new route file.",
+          "alignment": "left",
+          "actionsLayout": "row",
+          "primaryAction": {
+            "label": "Shop products",
+            "href": "/products",
+            "variant": "default",
+            "icon": "arrow-right"
+          },
+          "secondaryAction": {
+            "label": "Back home",
+            "href": "/",
+            "variant": "outline"
+          },
+          "media": {
+            "imageUrl": "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80&w=1200",
+            "alt": "Editorial fashion scene"
+          },
+          "theme": {
+            "background": "#f8fafc",
+            "foreground": "#0f172a",
+            "accent": "#2563eb",
+            "mutedForeground": "#475569",
+            "cardBackground": "#ffffff",
+            "borderColor": "#cbd5e1"
+          }
+        },
+        {
+          "type": "rich-text",
+          "eyebrow": "Why it matters",
+          "title": "Composable sections, safe rendering",
+          "body": [
+            "Each dynamic page is built from approved section types, so tenants can create new pages at runtime without shipping custom JSX.",
+            "That keeps your storefront flexible for content teams while preserving type safety, branding consistency, and rendering performance."
+          ],
+          "alignment": "left",
+          "cta": {
+            "label": "View homepage",
+            "href": "/",
+            "variant": "link"
+          },
+          "theme": {
+            "background": "#ffffff",
+            "foreground": "#111827",
+            "mutedForeground": "#6b7280",
+            "accent": "#2563eb"
+          }
+        },
+        {
+          "type": "image-banner",
+          "eyebrow": "Campaign block",
+          "title": "A runtime-defined promotional banner",
+          "description": "Use this section for launches, editorial campaigns, seasonal messages, or partner callouts.",
+          "imageUrl": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=1600",
+          "imageAlt": "Store campaign banner",
+          "height": "md",
+          "overlay": true,
+          "cta": {
+            "label": "Browse collection",
+            "href": "/products",
+            "variant": "secondary",
+            "icon": "arrow-right"
+          },
+          "theme": {
+            "foreground": "#ffffff",
+            "accent": "#ffffff",
+            "mutedForeground": "#e5e7eb"
+          }
+        },
+        {
+          "type": "featured-products",
+          "title": "Featured products",
+          "description": "The same merchandising block can appear on any runtime-configured page.",
+          "cta": {
+            "label": "Explore all products",
+            "href": "/products",
+            "variant": "outline",
+            "icon": "arrow-right"
+          },
+          "theme": {
+            "background": "#f8fafc",
+            "foreground": "#0f172a",
+            "mutedForeground": "#64748b",
+            "accent": "#0f172a",
+            "borderColor": "#cbd5e1"
+          }
+        }
+      ]
+    }
+  ]
+}

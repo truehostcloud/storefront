@@ -2,11 +2,18 @@ import type { Address, Cart, Country } from "@spree/sdk";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { PageSectionsRenderer } from "@/components/page-builder/PageSectionsRenderer";
 import { getAddresses } from "@/lib/data/addresses";
 import { getCheckoutOrder } from "@/lib/data/checkout";
 import { isAuthenticated as checkAuth } from "@/lib/data/cookies";
 import { getCountry } from "@/lib/data/countries";
-import { getMarketCountries, resolveMarket } from "@/lib/data/markets";
+import {
+  getMarketCountries,
+  resolveCurrency,
+  resolveMarket,
+} from "@/lib/data/markets";
+import { resolveTenantFixedPageSlots } from "@/lib/tenant";
+import { getTenantConfigFromRequest } from "@/lib/tenant/request";
 
 import { CheckoutPageContent } from "./CheckoutPageContent";
 
@@ -28,7 +35,13 @@ interface CheckoutPageProps {
 async function CheckoutDataLoader({ params }: CheckoutPageProps) {
   await connection();
 
-  const { id: cartId, country: urlCountry } = await params;
+  const { id: cartId, country: urlCountry, locale } = await params;
+  const basePath = `/${urlCountry}/${locale}`;
+  const [tenantConfig, currency] = await Promise.all([
+    getTenantConfigFromRequest(),
+    resolveCurrency(urlCountry),
+  ]);
+  const pageSlots = resolveTenantFixedPageSlots(tenantConfig);
 
   // Check auth first so we can skip address fetch for guests
   const authStatus = await checkAuth();
@@ -42,7 +55,6 @@ async function CheckoutDataLoader({ params }: CheckoutPageProps) {
 
   // Redirect to order-placed if already complete
   if (cartData?.current_step === "complete") {
-    const basePath = `/${urlCountry}/en`;
     redirect(`${basePath}/order-placed/${cartId}`);
   }
 
@@ -69,11 +81,33 @@ async function CheckoutDataLoader({ params }: CheckoutPageProps) {
     : null;
 
   return (
-    <CheckoutPageContent
-      cartId={cartId}
-      urlCountry={urlCountry}
-      initialData={initialData}
-    />
+    <>
+      {pageSlots.checkoutPage.beforeMain.length > 0 && (
+        <PageSectionsRenderer
+          sections={pageSlots.checkoutPage.beforeMain}
+          basePath={basePath}
+          locale={locale}
+          country={urlCountry}
+          currency={currency}
+          keyPrefix="checkout-before"
+        />
+      )}
+      <CheckoutPageContent
+        cartId={cartId}
+        urlCountry={urlCountry}
+        initialData={initialData}
+      />
+      {pageSlots.checkoutPage.afterMain.length > 0 && (
+        <PageSectionsRenderer
+          sections={pageSlots.checkoutPage.afterMain}
+          basePath={basePath}
+          locale={locale}
+          country={urlCountry}
+          currency={currency}
+          keyPrefix="checkout-after"
+        />
+      )}
+    </>
   );
 }
 

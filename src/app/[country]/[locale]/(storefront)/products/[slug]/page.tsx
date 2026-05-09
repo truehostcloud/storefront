@@ -2,8 +2,10 @@ import type { Category } from "@spree/sdk";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/navigation/Breadcrumbs";
+import { PageSectionsRenderer } from "@/components/page-builder/PageSectionsRenderer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getCachedProduct, PRODUCT_PAGE_EXPAND } from "@/lib/data/cached";
+import { resolveCurrency } from "@/lib/data/markets";
 import { generateProductMetadata } from "@/lib/metadata/product";
 import {
   buildBreadcrumbJsonLd,
@@ -11,6 +13,8 @@ import {
   buildProductJsonLd,
 } from "@/lib/seo";
 import { getStoreUrl } from "@/lib/store";
+import { resolveTenantFixedPageSlots } from "@/lib/tenant";
+import { getTenantConfigFromRequest } from "@/lib/tenant/request";
 import { ProductDetails } from "./ProductDetails";
 
 interface ProductPageProps {
@@ -50,6 +54,11 @@ export default async function ProductPage({
   const { country, locale, slug } = await params;
   const { category_id } = await searchParams;
   const basePath = `/${country}/${locale}`;
+  const [currency, tenantConfig] = await Promise.all([
+    resolveCurrency(country),
+    getTenantConfigFromRequest(),
+  ]);
+  const pageSlots = resolveTenantFixedPageSlots(tenantConfig);
 
   let product;
   try {
@@ -94,7 +103,27 @@ export default async function ProductPage({
           />
         )}
       </div>
+      {pageSlots.productPage.beforeMain.length > 0 && (
+        <PageSectionsRenderer
+          sections={pageSlots.productPage.beforeMain}
+          basePath={basePath}
+          locale={locale}
+          country={country}
+          currency={currency}
+          keyPrefix="product-before"
+        />
+      )}
       <ProductDetails product={product} basePath={basePath} />
+      {pageSlots.productPage.afterMain.length > 0 && (
+        <PageSectionsRenderer
+          sections={pageSlots.productPage.afterMain}
+          basePath={basePath}
+          locale={locale}
+          country={country}
+          currency={currency}
+          keyPrefix="product-after"
+        />
+      )}
     </>
   );
 }

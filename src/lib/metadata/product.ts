@@ -2,18 +2,25 @@ import type { Metadata } from "next";
 import { getCachedProduct, PRODUCT_METADATA_EXPAND } from "@/lib/data/cached";
 import { buildCanonicalUrl, stripHtml } from "@/lib/seo";
 import { getStoreUrl } from "@/lib/store";
+import type { TenantConfig } from "@/lib/tenant";
+import { getTenantConfigFromRequest } from "@/lib/tenant/request";
+import { getTenantSiteUrl } from "@/lib/tenant/surface";
 
 interface ProductMetadataParams {
   country: string;
   locale: string;
   slug: string;
+  tenantConfig?: TenantConfig | null;
 }
 
 export async function generateProductMetadata({
   country,
   locale,
   slug,
+  tenantConfig,
 }: ProductMetadataParams): Promise<Metadata> {
+  const resolvedTenantConfig =
+    tenantConfig ?? (await getTenantConfigFromRequest());
   let product;
   try {
     product = await getCachedProduct(slug, PRODUCT_METADATA_EXPAND);
@@ -28,7 +35,7 @@ export async function generateProductMetadata({
       ? stripHtml(product.description).slice(0, 160)
       : `Shop ${product.name}`;
 
-  const storeUrl = getStoreUrl();
+  const storeUrl = getTenantSiteUrl(resolvedTenantConfig) ?? getStoreUrl();
   const canonicalUrl = storeUrl
     ? buildCanonicalUrl(
         storeUrl,

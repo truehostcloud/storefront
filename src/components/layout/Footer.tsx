@@ -3,9 +3,12 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { POLICY_LINKS } from "@/lib/constants/policies";
 import { getStoreDescription, getStoreName } from "@/lib/store";
-
-const storeName = getStoreName();
-const storeDescription = getStoreDescription();
+import type { TenantConfig } from "@/lib/tenant";
+import {
+  resolveTenantBranding,
+  resolveTenantFooter,
+  resolveTenantNavigation,
+} from "@/lib/tenant";
 
 // Demo-only: Remove for production.
 const githubUrl = "https://github.com/spree/storefront";
@@ -17,15 +20,49 @@ interface FooterProps {
   rootCategories: Category[];
   basePath: string;
   locale: Locale;
+  tenantConfig?: TenantConfig | null;
 }
 
 export async function Footer({
   rootCategories,
   basePath,
   locale,
+  tenantConfig,
 }: FooterProps) {
   const t = await getTranslations({ locale, namespace: "footer" });
   const tp = await getTranslations({ locale, namespace: "policies" });
+  const branding = resolveTenantBranding(tenantConfig, {
+    name: getStoreName(),
+    description: getStoreDescription(),
+  });
+  const navigation = resolveTenantNavigation(tenantConfig);
+  const footerConfig = resolveTenantFooter(tenantConfig, {
+    description:
+      t("description") || branding.description || getStoreDescription(),
+    resourceLinks: [
+      { label: t("forkOnGithub"), href: githubUrl },
+      { label: t("quickstartGuide"), href: quickstartUrl },
+      { label: t("learnMore"), href: learnMoreUrl },
+    ],
+    shopLinks: [
+      ...navigation.footerLinks,
+      { label: t("allProducts"), href: `${basePath}/products` },
+      ...rootCategories.map((category) => ({
+        label: category.name,
+        href: `${basePath}/c/${category.permalink}`,
+      })),
+    ],
+    accountLinks: [
+      { label: t("myAccount"), href: `${basePath}/account` },
+      { label: t("orderHistory"), href: `${basePath}/account/orders` },
+      { label: t("cart"), href: `${basePath}/cart` },
+    ],
+    policyLinks: POLICY_LINKS.map((policy) => ({
+      label: tp(policy.nameKey),
+      href: `${basePath}/policies/${policy.slug}`,
+    })),
+    showPolicies: true,
+  });
 
   return (
     <footer className="bg-primary text-gray-300">
@@ -34,37 +71,32 @@ export async function Footer({
           {/* Demo-only: Remove for production. */}
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
-            <span className="text-xl font-bold text-white">{storeName}</span>
+            <span className="text-xl font-bold text-white">
+              {branding.name}
+            </span>
             <p className="mt-4 text-sm text-neutral-400">
-              {t("description") || storeDescription}
+              {footerConfig.description}
             </p>
-            {/* Demo-only: Remove for production. */}
-            <div className="mt-4 flex flex-col gap-2">
-              <Link
-                href={githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-white hover:text-neutral-200 transition-colors font-medium"
-              >
-                {t("forkOnGithub")} &rarr;
-              </Link>
-              <Link
-                href={quickstartUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
-              >
-                {t("quickstartGuide")}
-              </Link>
-              <Link
-                href={learnMoreUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
-              >
-                {t("learnMore")}
-              </Link>
-            </div>
+            {footerConfig.resourceLinks.length > 0 && (
+              <div className="mt-4 flex flex-col gap-2">
+                {footerConfig.resourceLinks.map((link, index) => (
+                  <Link
+                    key={`${link.href}-${index}`}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={
+                      index === 0
+                        ? "text-sm text-white hover:text-neutral-200 transition-colors font-medium"
+                        : "text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
+                    }
+                  >
+                    {link.label}
+                    {index === 0 ? " →" : ""}
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Links */}
@@ -73,21 +105,13 @@ export async function Footer({
               {t("shop")}
             </h3>
             <ul className="mt-4 space-y-3">
-              <li>
-                <Link
-                  href={`${basePath}/products`}
-                  className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
-                >
-                  {t("allProducts")}
-                </Link>
-              </li>
-              {rootCategories.map((category) => (
-                <li key={category.id}>
+              {footerConfig.shopLinks.map((link) => (
+                <li key={link.href}>
                   <Link
-                    href={`${basePath}/c/${category.permalink}`}
+                    href={link.href}
                     className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
                   >
-                    {category.name}
+                    {link.label}
                   </Link>
                 </li>
               ))}
@@ -100,30 +124,16 @@ export async function Footer({
               {t("account")}
             </h3>
             <ul className="mt-4 space-y-3">
-              <li>
-                <Link
-                  href={`${basePath}/account`}
-                  className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
-                >
-                  {t("myAccount")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href={`${basePath}/account/orders`}
-                  className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
-                >
-                  {t("orderHistory")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href={`${basePath}/cart`}
-                  className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
-                >
-                  {t("cart")}
-                </Link>
-              </li>
+              {footerConfig.accountLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -132,24 +142,26 @@ export async function Footer({
             <h3 className="text-sm font-medium text-neutral-300">
               {t("policies")}
             </h3>
-            <ul className="mt-4 space-y-3">
-              {POLICY_LINKS.map((policy) => (
-                <li key={policy.slug}>
-                  <Link
-                    href={`${basePath}/policies/${policy.slug}`}
-                    className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
-                  >
-                    {tp(policy.nameKey)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {footerConfig.showPolicies && (
+              <ul className="mt-4 space-y-3">
+                {footerConfig.policyLinks.map((policy) => (
+                  <li key={policy.href}>
+                    <Link
+                      href={policy.href}
+                      className="text-sm text-neutral-400 hover:text-neutral-200 transition-colors"
+                    >
+                      {policy.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
 
         <div className="mt-8 pt-8 border-t border-neutral-800 text-xs text-neutral-400 text-center">
           <p>
-            &copy; {new Date().getFullYear()} {storeName}. {t("poweredBy")}{" "}
+            &copy; {new Date().getFullYear()} {branding.name}. {t("poweredBy")}
             <Link
               href="https://spreecommerce.org"
               target="_blank"

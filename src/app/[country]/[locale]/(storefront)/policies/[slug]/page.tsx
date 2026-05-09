@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getPolicy } from "@/lib/data/policies";
 import { getStoreName } from "@/lib/store";
+import { getTenantConfigFromRequest } from "@/lib/tenant/request";
+import { getTenantBrandName, getTenantDescription } from "@/lib/tenant/surface";
 
 interface PolicyPageProps {
   params: Promise<{
@@ -17,8 +19,8 @@ export async function generateMetadata({
 }: PolicyPageProps): Promise<Metadata> {
   const { slug, locale } = await params;
   const policy = await getPolicy(slug);
-
-  const storeName = getStoreName();
+  const tenantConfig = await getTenantConfigFromRequest();
+  const storeName = getTenantBrandName(tenantConfig) ?? getStoreName();
 
   if (!policy) {
     const t = await getTranslations({
@@ -33,10 +35,12 @@ export async function generateMetadata({
 
   return {
     title: storeName ? `${policy.name} | ${storeName}` : policy.name,
-    description: `${policy.name} — ${storeName}`,
+    description:
+      getTenantDescription(tenantConfig) ?? `${policy.name} — ${storeName}`,
     openGraph: {
       title: policy.name,
-      description: `${policy.name} — ${storeName}`,
+      description:
+        getTenantDescription(tenantConfig) ?? `${policy.name} — ${storeName}`,
     },
   };
 }

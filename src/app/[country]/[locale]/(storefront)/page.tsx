@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import { FeaturedProductsSection } from "@/components/home/FeaturedProductsSection";
+import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { HeroSection } from "@/components/home/HeroSection";
 import { getMarkets, resolveCurrency } from "@/lib/data/markets";
+import { getHomepageConfig, getHomepageSections } from "@/lib/homepage";
 import { generateHomeMetadata } from "@/lib/metadata/home";
-import { getDefaultCountry, getDefaultLocale } from "@/lib/store";
+import { getDefaultCountry, getDefaultLocale, getStoreName } from "@/lib/store";
+import { getTenantConfigFromRequest } from "@/lib/tenant/request";
+import { getTenantBrandName } from "@/lib/tenant/surface";
 
 interface HomePageProps {
   params: Promise<{
@@ -72,16 +76,40 @@ export default async function HomePage({ params }: HomePageProps) {
   const { country, locale } = await params;
   const basePath = `/${country}/${locale}`;
   const currency = await resolveCurrency(country);
+  const tenantConfig = await getTenantConfigFromRequest();
+  const storeName = getTenantBrandName(tenantConfig) ?? getStoreName();
+  const homepageConfig = getHomepageConfig({ storeName }, tenantConfig?.raw);
+  const sections = getHomepageSections(homepageConfig);
 
   return (
-    <div>
-      <HeroSection basePath={basePath} locale={locale} />
-      <FeaturedProductsSection
-        basePath={basePath}
-        locale={locale}
-        country={country}
-        currency={currency}
-      />
+    <div className="flex flex-col gap-0">
+      {sections.map((section) => {
+        switch (section.type) {
+          case "hero":
+            return (
+              <HeroSection
+                key={section.type}
+                basePath={basePath}
+                section={section}
+              />
+            );
+          case "features":
+            return <FeaturesSection key={section.type} section={section} />;
+          case "featured-products":
+            return (
+              <FeaturedProductsSection
+                key={section.type}
+                basePath={basePath}
+                country={country}
+                currency={currency}
+                locale={locale}
+                section={section}
+              />
+            );
+          default:
+            return null;
+        }
+      })}
     </div>
   );
 }
