@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactElement } from "react";
 import { FeaturedProductsSection } from "@/components/home/FeaturedProductsSection";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { HeroSection } from "@/components/home/HeroSection";
@@ -25,7 +26,9 @@ interface HomePageProps {
  * always include the store's configured default country/locale as a
  * fallback even if the markets fetch fails.
  */
-export async function generateStaticParams() {
+export async function generateStaticParams(): Promise<
+  Array<{ country: string; locale: string }>
+> {
   const fallback = {
     country: getDefaultCountry(),
     locale: getDefaultLocale(),
@@ -72,7 +75,9 @@ export async function generateMetadata({
   return generateHomeMetadata({ country, locale });
 }
 
-export default async function HomePage({ params }: HomePageProps) {
+export default async function HomePage({
+  params,
+}: HomePageProps): Promise<ReactElement> {
   const { country, locale } = await params;
   const basePath = `/${country}/${locale}`;
   const currency = await resolveCurrency(country);

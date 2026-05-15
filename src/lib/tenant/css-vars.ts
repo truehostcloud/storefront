@@ -67,15 +67,13 @@ export function resolveTenantThemeConfig(
 
 export function buildCssVars(config: TenantConfig): Record<string, string> {
   const theme = resolveTenantThemeConfig(config);
-  const branding = getNestedRecord(theme["branding"]);
+  const branding = getNestedRecord(theme.branding);
   const colors =
-    getNestedRecord(theme["colors"]) ??
-    getNestedRecord(branding?.["colors"]) ??
-    {};
-  const fonts = getNestedRecord(theme["fonts"]) ?? {};
+    getNestedRecord(theme.colors) ?? getNestedRecord(branding?.colors) ?? {};
+  const fonts = getNestedRecord(theme.fonts) ?? {};
 
-  const spacing = getString(theme["spacing"]);
-  const radius = getString(theme["borderRadius"]);
+  const spacing = getString(theme.spacing);
+  const radius = getString(theme.borderRadius);
   const spacingPreset =
     SPACING_MAP[(spacing as keyof typeof SPACING_MAP) ?? "comfortable"] ??
     SPACING_MAP.comfortable;

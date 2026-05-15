@@ -17,12 +17,17 @@ import { buildOrganizationJsonLd } from "@/lib/seo";
 import { getDefaultCountry, getDefaultLocale } from "@/lib/store";
 import { getTenantConfigByHost } from "@/lib/tenant";
 import { buildCssVars } from "@/lib/tenant/css-vars";
-import { getTenantConfigFromRequest } from "@/lib/tenant/request";
+import { toPublicTenantConfig } from "@/lib/tenant/normalize";
+import {
+  getRequestHost,
+  getTenantConfigFromRequest,
+} from "@/lib/tenant/request";
 import deMessages from "../../../../messages/de.json";
 import enMessages from "../../../../messages/en.json";
 import esMessages from "../../../../messages/es.json";
 import frMessages from "../../../../messages/fr.json";
 import plMessages from "../../../../messages/pl.json";
+import LocaleLayoutLoading from "./loading";
 
 const messagesMap: Record<string, IntlMessages> = {
   en: enMessages,
@@ -73,7 +78,7 @@ export default async function CountryLocaleLayout({
   params,
 }: CountryLocaleLayoutProps) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<LocaleLayoutLoading />}>
       <CountryLocaleLayoutInner params={params}>
         {children}
       </CountryLocaleLayoutInner>
@@ -87,10 +92,7 @@ async function CountryLocaleLayoutInner({
 }: CountryLocaleLayoutProps) {
   const { country, locale } = await params;
   const requestHeaders = await headers();
-  const host =
-    requestHeaders.get("x-forwarded-host") ??
-    requestHeaders.get("host") ??
-    "localhost";
+  const host = getRequestHost(requestHeaders) ?? "localhost";
   const tenantConfig = await getTenantConfigByHost(host);
   if (!tenantConfig) {
     return <OlittFallbackPage host={host} />;
@@ -135,7 +137,7 @@ async function CountryLocaleLayoutInner({
       data-tenant-host={tenantConfig.host}
       data-tenant-id={tenantConfig.tenantId}
     >
-      <TenantConfigProvider config={tenantConfig}>
+      <TenantConfigProvider config={toPublicTenantConfig(tenantConfig)}>
         <NextIntlClientProvider
           messages={messages}
           locale={locale as "en" | "de" | "pl"}

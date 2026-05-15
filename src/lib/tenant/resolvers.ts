@@ -6,7 +6,7 @@ import {
   getTenantNavigationLinks,
   type TenantLink,
 } from "./surface";
-import type { TenantConfig } from "./types";
+import type { TenantSurfaceConfig } from "./types";
 
 function getRecord(value: unknown): Record<string, unknown> | undefined {
   if (value && typeof value === "object" && !Array.isArray(value)) {
@@ -67,15 +67,15 @@ function getSections(value: unknown): DynamicPageSectionConfig[] {
   return getArray(value).filter(isDynamicPageSection);
 }
 
-function getRawConfig(config?: TenantConfig | null) {
+function getRawConfig(config?: TenantSurfaceConfig | null) {
   return getRecord(config?.raw);
 }
 
-function getDesignConfig(config?: TenantConfig | null) {
+function getDesignConfig(config?: TenantSurfaceConfig | null) {
   return getRecord(getRawConfig(config)?.design);
 }
 
-function getLayoutConfig(config?: TenantConfig | null) {
+function getLayoutConfig(config?: TenantSurfaceConfig | null) {
   return getRecord(getDesignConfig(config)?.layout);
 }
 
@@ -111,7 +111,7 @@ export interface TenantFixedPageSlotsConfig {
 }
 
 export function resolveTenantBranding(
-  config?: TenantConfig | null,
+  config?: TenantSurfaceConfig | null,
   defaults: TenantBrandingConfig = {},
 ): TenantBrandingConfig {
   const raw = getRawConfig(config);
@@ -145,7 +145,7 @@ export function resolveTenantBranding(
 }
 
 export function resolveTenantNavigation(
-  config?: TenantConfig | null,
+  config?: TenantSurfaceConfig | null,
   defaults: Partial<TenantNavigationConfig> = {},
 ): TenantNavigationConfig {
   const raw = getRawConfig(config);
@@ -184,7 +184,7 @@ export function resolveTenantNavigation(
 }
 
 export function resolveTenantFooter(
-  config?: TenantConfig | null,
+  config?: TenantSurfaceConfig | null,
   defaults: Partial<TenantFooterConfig> = {},
 ): TenantFooterConfig {
   const raw = getRawConfig(config);
@@ -234,7 +234,7 @@ export function resolveTenantFooter(
 }
 
 export function resolveTenantFixedPageSlots(
-  config?: TenantConfig | null,
+  config?: TenantSurfaceConfig | null,
   defaults: Partial<TenantFixedPageSlotsConfig> = {},
 ): TenantFixedPageSlotsConfig {
   const raw = getRawConfig(config);

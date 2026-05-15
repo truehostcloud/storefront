@@ -1,4 +1,4 @@
-import type { TenantConfig } from "./types";
+import type { TenantSurfaceConfig } from "./types";
 export interface TenantLink {
   label: string;
   href: string;
@@ -20,7 +20,7 @@ function getArray(value: unknown): unknown[] {
 }
 
 export function getTenantBrandName(
-  config?: TenantConfig | null,
+  config?: TenantSurfaceConfig | null,
 ): string | undefined {
   const branding = getRecord(config?.raw?.branding);
 
@@ -33,7 +33,7 @@ export function getTenantBrandName(
 }
 
 export function getTenantDescription(
-  config?: TenantConfig | null,
+  config?: TenantSurfaceConfig | null,
 ): string | undefined {
   const branding = getRecord(config?.raw?.branding);
 
@@ -46,7 +46,7 @@ export function getTenantDescription(
 }
 
 export function getTenantSiteUrl(
-  config?: TenantConfig | null,
+  config?: TenantSurfaceConfig | null,
 ): string | undefined {
   return (
     config?.storeUrl ||
@@ -57,7 +57,7 @@ export function getTenantSiteUrl(
 }
 
 export function getTenantLogoUrl(
-  config?: TenantConfig | null,
+  config?: TenantSurfaceConfig | null,
 ): string | undefined {
   const branding = getRecord(config?.raw?.branding);
   const theme = getRecord(config?.theme);
@@ -77,7 +77,7 @@ export function getTenantLogoUrl(
 }
 
 export function getTenantTwitterHandle(
-  config?: TenantConfig | null,
+  config?: TenantSurfaceConfig | null,
 ): string | undefined {
   const seo = getRecord(config?.seo);
   const raw = getRecord(config?.raw);
@@ -90,7 +90,9 @@ export function getTenantTwitterHandle(
   );
 }
 
-export function getTenantSocialLinks(config?: TenantConfig | null): string[] {
+export function getTenantSocialLinks(
+  config?: TenantSurfaceConfig | null,
+): string[] {
   const branding = getRecord(config?.raw?.branding);
   const seo = getRecord(config?.seo);
   const raw = getRecord(config?.raw);
@@ -107,7 +109,7 @@ export function getTenantSocialLinks(config?: TenantConfig | null): string[] {
 }
 
 export function getTenantNavigationLinks(
-  config?: TenantConfig | null,
+  config?: TenantSurfaceConfig | null,
 ): TenantLink[] {
   const navigation = getRecord(config?.navigation);
   const links = getArray(navigation?.links);

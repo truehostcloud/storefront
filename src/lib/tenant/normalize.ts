@@ -1,4 +1,8 @@
-import type { TenantConfig } from "./types";
+import type {
+  PublicTenantConfig,
+  PublicTenantPaymentKeys,
+  TenantConfig,
+} from "./types";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -150,6 +154,17 @@ function collectPaymentKeys(
   return result;
 }
 
+function collectPublicPaymentKeys(
+  config: TenantConfig,
+): PublicTenantPaymentKeys {
+  const stripePublishableKey =
+    config.paymentKeys.stripePublishableKey?.trim() || undefined;
+
+  return {
+    ...(stripePublishableKey ? { stripePublishableKey } : {}),
+  };
+}
+
 function getSpreeConfig(record: Record<string, unknown>): {
   apiUrl: string;
   publishableKey: string;
@@ -197,5 +212,15 @@ export function buildTenantConfigFromRecord(
     raw: record,
     source: "olitt",
     fetchedAt: new Date().toISOString(),
+  };
+}
+
+export function toPublicTenantConfig(config: TenantConfig): PublicTenantConfig {
+  return {
+    storeName: config.storeName,
+    spree: config.spree,
+    paymentKeys: collectPublicPaymentKeys(config),
+    theme: config.theme,
+    navigation: config.navigation,
   };
 }
