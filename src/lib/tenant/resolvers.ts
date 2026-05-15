@@ -67,15 +67,21 @@ function getSections(value: unknown): DynamicPageSectionConfig[] {
   return getArray(value).filter(isDynamicPageSection);
 }
 
-function getRawConfig(config?: TenantSurfaceConfig | null) {
+function getRawConfig(
+  config?: TenantSurfaceConfig | null,
+): Record<string, unknown> | undefined {
   return getRecord(config?.raw);
 }
 
-function getDesignConfig(config?: TenantSurfaceConfig | null) {
+function getDesignConfig(
+  config?: TenantSurfaceConfig | null,
+): Record<string, unknown> | undefined {
   return getRecord(getRawConfig(config)?.design);
 }
 
-function getLayoutConfig(config?: TenantSurfaceConfig | null) {
+function getLayoutConfig(
+  config?: TenantSurfaceConfig | null,
+): Record<string, unknown> | undefined {
   return getRecord(getDesignConfig(config)?.layout);
 }
 

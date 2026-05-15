@@ -59,6 +59,16 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "olitt.store",
+        pathname: "/rails/active_storage/**",
+      },
+      {
+        protocol: "https",
+        hostname: "**.olitt.store",
+        pathname: "/rails/active_storage/**",
+      },
+      {
+        protocol: "https",
         hostname: "images.unsplash.com",
       },
     ],

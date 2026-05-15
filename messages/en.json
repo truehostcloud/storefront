@@ -53,7 +53,7 @@
     "cart": "Cart",
     "policies": "Policies",
     "poweredBy": "Powered by",
-    "copyright": "© {year} {storeName}. Powered by Spree Commerce."
+    "copyright": "© {year} {storeName}. Powered by Olitt"
   },
   "home": {
     "welcome": "{storeName} Storefront",

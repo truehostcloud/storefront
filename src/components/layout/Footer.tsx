@@ -39,11 +39,7 @@ export async function Footer({
   const footerConfig = resolveTenantFooter(tenantConfig, {
     description:
       t("description") || branding.description || getStoreDescription(),
-    resourceLinks: [
-      { label: t("forkOnGithub"), href: githubUrl },
-      { label: t("quickstartGuide"), href: quickstartUrl },
-      { label: t("learnMore"), href: learnMoreUrl },
-    ],
+    resourceLinks: [],
     shopLinks: [
       ...navigation.footerLinks,
       { label: t("allProducts"), href: `${basePath}/products` },
