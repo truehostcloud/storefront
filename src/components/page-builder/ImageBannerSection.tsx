@@ -1,6 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactElement } from "react";
 import { Button } from "@/components/ui/button";
 import type { DynamicPageImageBannerSectionConfig } from "@/lib/page-builder";
 
@@ -16,7 +16,9 @@ function resolveHref(basePath: string, href: string): string {
   return href.startsWith("/") ? `${basePath}${href}` : `${basePath}/${href}`;
 }
 
-function getHeightClass(height: DynamicPageImageBannerSectionConfig["height"]) {
+function getHeightClass(
+  height: DynamicPageImageBannerSectionConfig["height"],
+): string {
   switch (height) {
     case "sm":
       return "min-h-[320px]";
@@ -30,7 +32,7 @@ function getHeightClass(height: DynamicPageImageBannerSectionConfig["height"]) {
 export function ImageBannerSection({
   basePath,
   section,
-}: ImageBannerSectionProps) {
+}: ImageBannerSectionProps): ReactElement {
   const theme = section.theme ?? {};
   const foreground = theme.foreground ?? "#ffffff";
   const mutedTextColor = theme.mutedForeground ?? "#e5e7eb";

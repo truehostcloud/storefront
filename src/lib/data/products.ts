@@ -71,7 +71,7 @@ export async function cachedListProducts(
   baseUrl?: string,
   publishableKey?: string,
   _spreeScope?: string,
-) {
+): Promise<PaginatedResponse<Product>> {
   "use cache: remote";
   cacheLife("tenMinutes");
   cacheTag("products");
@@ -85,7 +85,9 @@ export async function cachedListProducts(
   }).products.list(params, options);
 }
 
-export async function getProducts(params?: ProductListParams) {
+export async function getProducts(
+  params?: ProductListParams,
+): Promise<PaginatedResponse<Product>> {
   const options = await getLocaleOptions();
   const userToken = await getAccessToken();
   const spreeConfig = await resolveSpreeConfig();
@@ -116,7 +118,7 @@ export async function cachedGetProduct(
   baseUrl?: string,
   publishableKey?: string,
   _spreeScope?: string,
-) {
+): Promise<Product> {
   "use cache: remote";
   cacheLife("tenMinutes");
   cacheTag("products", `product:${slugOrId}`);
@@ -133,7 +135,7 @@ export async function cachedGetProduct(
 export async function getProduct(
   slugOrId: string,
   params?: { expand?: string[] },
-) {
+): Promise<Product> {
   const options = await getLocaleOptions();
   const userToken = await getAccessToken();
   const spreeConfig = await resolveSpreeConfig();
@@ -155,7 +157,7 @@ async function cachedGetProductFilters(
   baseUrl?: string,
   publishableKey?: string,
   _spreeScope?: string,
-) {
+): Promise<ProductFiltersResponse> {
   "use cache: remote";
   cacheLife("tenMinutes");
   cacheTag("product-filters");
@@ -169,7 +171,9 @@ async function cachedGetProductFilters(
   }).products.filters(params, options);
 }
 
-export async function getProductFilters(params?: Record<string, unknown>) {
+export async function getProductFilters(
+  params?: Record<string, unknown>,
+): Promise<ProductFiltersResponse> {
   const options = await getLocaleOptions();
   const userToken = await getAccessToken();
   const spreeConfig = await resolveSpreeConfig();

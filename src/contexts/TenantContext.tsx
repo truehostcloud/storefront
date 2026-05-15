@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, type ReactNode, useContext, useMemo } from "react";
+import {
+  createContext,
+  type ReactElement,
+  type ReactNode,
+  useContext,
+  useMemo,
+} from "react";
 import type { PublicTenantConfig } from "@/lib/tenant";
 
 const TenantContext = createContext<PublicTenantConfig | null>(null);
@@ -11,7 +17,7 @@ export function TenantConfigProvider({
 }: {
   children: ReactNode;
   config: PublicTenantConfig;
-}) {
+}): ReactElement {
   const value = useMemo(() => config, [config]);
 
   return (
@@ -29,18 +35,18 @@ export function useTenantConfig(): PublicTenantConfig {
   return context;
 }
 
-export function useTenantTheme() {
+export function useTenantTheme(): PublicTenantConfig["theme"] {
   return useTenantConfig().theme;
 }
 
-export function useTenantNavigation() {
+export function useTenantNavigation(): PublicTenantConfig["navigation"] {
   return useTenantConfig().navigation;
 }
 
-export function useTenantPayments() {
+export function useTenantPayments(): PublicTenantConfig["paymentKeys"] {
   return useTenantConfig().paymentKeys;
 }
 
-export function useTenantSpree() {
+export function useTenantSpree(): PublicTenantConfig["spree"] {
   return useTenantConfig().spree;
 }

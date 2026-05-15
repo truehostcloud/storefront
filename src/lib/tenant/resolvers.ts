@@ -6,7 +6,7 @@ import {
   getTenantNavigationLinks,
   type TenantLink,
 } from "./surface";
-import type { TenantConfig, TenantSurfaceConfig } from "./types";
+import type { TenantSurfaceConfig } from "./types";
 
 function getRecord(value: unknown): Record<string, unknown> | undefined {
   if (value && typeof value === "object" && !Array.isArray(value)) {
