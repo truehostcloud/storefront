@@ -1,16 +1,16 @@
 "use client";
 
 import { createContext, type ReactNode, useContext, useMemo } from "react";
-import type { TenantConfig } from "@/lib/tenant";
+import type { PublicTenantConfig } from "@/lib/tenant";
 
-const TenantContext = createContext<TenantConfig | null>(null);
+const TenantContext = createContext<PublicTenantConfig | null>(null);
 
 export function TenantConfigProvider({
   children,
   config,
 }: {
   children: ReactNode;
-  config: TenantConfig;
+  config: PublicTenantConfig;
 }) {
   const value = useMemo(() => config, [config]);
 
@@ -19,7 +19,7 @@ export function TenantConfigProvider({
   );
 }
 
-export function useTenantConfig(): TenantConfig {
+export function useTenantConfig(): PublicTenantConfig {
   const context = useContext(TenantContext);
   if (!context) {
     throw new Error(

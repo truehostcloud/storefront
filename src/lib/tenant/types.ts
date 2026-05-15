@@ -3,6 +3,18 @@ export interface TenantSpreeConfig {
   publishableKey: string;
 }
 
+export interface PublicTenantPaymentKeys {
+  stripePublishableKey?: string;
+}
+
+export interface PublicTenantConfig {
+  storeName: string;
+  spree: TenantSpreeConfig;
+  paymentKeys: PublicTenantPaymentKeys;
+  theme: Record<string, unknown>;
+  navigation: Record<string, unknown>;
+}
+
 export interface TenantConfig {
   tenantId: string;
   host: string;

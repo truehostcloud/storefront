@@ -14,7 +14,6 @@ function getFeatureIcon(iconName?: string) {
       return <ShieldCheck className="w-6 h-6" />;
     case "shopping-bag":
       return <ShoppingBag className="w-6 h-6" />;
-    case "sparkles":
     default:
       return <Sparkles className="w-6 h-6" />;
   }

@@ -5,6 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { getCategories } from "@/lib/data/categories";
 import { getTenantConfigByHost } from "@/lib/tenant";
+import { getRequestHost } from "@/lib/tenant/request";
 
 interface StorefrontLayoutProps {
   children: React.ReactNode;
@@ -41,10 +42,7 @@ export default async function StorefrontLayout({
   const { country, locale } = await params;
   const basePath = `/${country}/${locale}`;
   const requestHeaders = await headers();
-  const tenantHost =
-    requestHeaders.get("x-forwarded-host") ??
-    requestHeaders.get("host") ??
-    "localhost";
+  const tenantHost = getRequestHost(requestHeaders) ?? "localhost";
   const tenantConfig = await getTenantConfigByHost(tenantHost);
 
   const rootCategories = await getCategories({

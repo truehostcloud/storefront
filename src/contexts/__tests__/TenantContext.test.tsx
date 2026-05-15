@@ -13,9 +13,6 @@ const tenantConfig = {
     apiUrl: "https://spree.example.com",
     publishableKey: "pub-key",
   },
-  paymentKeys: {
-    stripePublishableKey: "pk_test_123",
-  },
   theme: {
     colors: {
       primary: "#111111",
@@ -25,9 +22,9 @@ const tenantConfig = {
   navigation: {
     links: [{ label: "Products", href: "/products" }],
   },
-  raw: {},
-  source: "olitt",
-  fetchedAt: new Date().toISOString(),
+  paymentKeys: {
+    stripePublishableKey: "pk_test_123",
+  },
 } as never;
 
 function wrapper({ children }: { children: React.ReactNode }) {

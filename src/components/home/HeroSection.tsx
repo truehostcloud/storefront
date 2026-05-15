@@ -1,4 +1,5 @@
 import { ArrowRight, Play } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { Button } from "@/components/ui/button";
@@ -178,13 +179,16 @@ export async function HeroSection({ basePath, section }: HeroSectionProps) {
               style={{ backgroundColor: cardBackground }}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
-              <img
+              <Image
                 src={
                   section.media?.imageUrl ??
                   "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&q=80&w=1200"
                 }
                 alt={section.media?.alt ?? section.title}
-                className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all duration-700 scale-105 hover:scale-100"
+                fill
+                priority
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover grayscale-[0.2] hover:grayscale-0 transition-all duration-700 scale-105 hover:scale-100"
               />
             </div>
 
