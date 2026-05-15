@@ -16,8 +16,13 @@ function isTrustedProxyEnabled(): boolean {
 
 function normalizeHeaderHost(value: string | null): string | null {
   if (!value) return null;
-  if (value.includes(",")) return null;
-  return normalizeHost(value, { preservePort: true });
+
+  for (const entry of value.split(",")) {
+    const normalized = normalizeHost(entry, { preservePort: true });
+    if (normalized) return normalized;
+  }
+
+  return null;
 }
 
 export function getRequestHost(requestHeaders: Headers): string | null {

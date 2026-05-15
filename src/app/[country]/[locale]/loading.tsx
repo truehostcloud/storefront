@@ -1,9 +1,10 @@
 import { headers } from "next/headers";
+import type { ReactElement } from "react";
 import { getTenantConfigByHost } from "@/lib/tenant/olitt";
 import { getRequestHost } from "@/lib/tenant/request";
 import { getTenantBrandName } from "@/lib/tenant/surface";
 
-export default async function Loading() {
+export default async function Loading(): Promise<ReactElement> {
   const requestHeaders = await headers();
   const host = getRequestHost(requestHeaders) ?? "";
   const tenantConfig = host ? await getTenantConfigByHost(host) : null;
