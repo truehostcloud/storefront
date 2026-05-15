@@ -37,17 +37,14 @@ export function getStoreUrl(): string | undefined {
  * Get the store name from environment variables.
  */
 export function getStoreName(): string {
-  return process.env.NEXT_PUBLIC_STORE_NAME || "Spree Store";
+  return process.env.NEXT_PUBLIC_STORE_NAME || "Olitt Store";
 }
 
 /**
  * Get the store description from environment variables.
  */
 export function getStoreDescription(): string {
-  return (
-    process.env.NEXT_PUBLIC_STORE_DESCRIPTION ||
-    "A modern e-commerce storefront powered by Spree Commerce and Next.js."
-  );
+  return process.env.NEXT_PUBLIC_STORE_DESCRIPTION || "Powered by Olitt.";
 }
 
 /**
@@ -69,7 +66,7 @@ export function getDefaultLocale(): string {
  * store name (NEXT_PUBLIC_STORE_NAME).
  */
 export function getStoreSeoTitle(): string {
-  return process.env.STORE_SEO_TITLE || getStoreName();
+  return getStoreName();
 }
 
 /**
@@ -77,7 +74,7 @@ export function getStoreSeoTitle(): string {
  * back to the store description (NEXT_PUBLIC_STORE_DESCRIPTION).
  */
 export function getStoreMetaDescription(): string {
-  return process.env.STORE_META_DESCRIPTION || getStoreDescription();
+  return getStoreDescription();
 }
 
 /**

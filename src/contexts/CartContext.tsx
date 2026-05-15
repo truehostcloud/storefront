@@ -34,6 +34,28 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const EMPTY_CART_CONTEXT: CartContextType = {
+  cart: null,
+  loading: false,
+  updating: false,
+  itemCount: 0,
+  isOpen: false,
+  openCart: () => {},
+  closeCart: () => {},
+  addItem: async () => {},
+  updateItem: async () => {},
+  removeItem: async () => {},
+  refreshCart: async () => {},
+};
+
+export function CartProviderFallback({ children }: { children: ReactNode }) {
+  return (
+    <CartContext.Provider value={EMPTY_CART_CONTEXT}>
+      {children}
+    </CartContext.Provider>
+  );
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);

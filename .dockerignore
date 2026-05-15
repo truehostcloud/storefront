@@ -1,0 +1,14 @@
+.git
+.github
+.next
+node_modules
+npm-debug.log*
+.dockerignore
+.env
+.env.*
+!.env.example
+!.env.local.example
+coverage
+dist
+tmp
+.DS_Store

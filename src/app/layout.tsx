@@ -3,10 +3,12 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import "./globals.css";
 import { Suspense } from "react";
+
 import { CartProvider } from "@/contexts/CartContext";
 import { getStoreDescription, getStoreName } from "@/lib/store";
+
+import "./globals.css";
 
 const gtmId = process.env.GTM_ID;
 const spreeApiOrigin = (() => {
@@ -35,13 +37,13 @@ export const metadata: Metadata = {
   description: getStoreDescription(),
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         {spreeApiOrigin && (
           <>
@@ -53,8 +55,9 @@ export default function RootLayout({
       {gtmId && <GoogleTagManager gtmId={gtmId} />}
       <body
         className={`${geist.variable} antialiased min-h-screen flex flex-col`}
+        suppressHydrationWarning
       >
-        <Suspense fallback={null}>
+        <Suspense fallback={<div className="min-h-screen" />}>
           <CartProvider>{children}</CartProvider>
         </Suspense>
         <Analytics />

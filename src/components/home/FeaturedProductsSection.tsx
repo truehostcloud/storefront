@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import type { CSSProperties } from "react";
 import { Suspense } from "react";
 import { FeaturedProducts } from "@/components/products/FeaturedProducts";
 import { ProductCardSkeleton } from "@/components/products/ProductCardSkeleton";
 import { Button } from "@/components/ui/button";
+import type { HomepageFeaturedProductsSectionConfig } from "@/lib/homepage";
 
 function CarouselSkeleton() {
   return (
@@ -20,6 +21,7 @@ interface FeaturedProductsSectionProps {
   locale: string;
   country: string;
   currency?: string;
+  section: HomepageFeaturedProductsSectionConfig;
 }
 
 export async function FeaturedProductsSection({
@@ -27,30 +29,65 @@ export async function FeaturedProductsSection({
   locale,
   country,
   currency,
+  section,
 }: FeaturedProductsSectionProps) {
-  const t = await getTranslations({
-    locale: locale as Locale,
-    namespace: "home",
-  });
+  const theme = section.theme ?? {};
+  const sectionStyle: CSSProperties = {
+    backgroundColor: theme.background,
+    color: theme.foreground,
+  };
+  const mutedTextColor = theme.mutedForeground ?? "#64748b";
+  const borderColor = theme.borderColor ?? "#cbd5e1";
+
+  const resolveHref = (href: string) => {
+    if (/^https?:\/\//.test(href)) return href;
+    if (href.startsWith(basePath)) return href;
+    if (href === "/") return basePath;
+    return href.startsWith("/") ? `${basePath}${href}` : `${basePath}/${href}`;
+  };
 
   return (
-    <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 featured-products">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl font-bold text-gray-900">
-          {t("featuredProducts")}
-        </h2>
-        <Button variant="link" asChild>
-          <Link href={`${basePath}/products`}>{t("viewAll")} &rarr;</Link>
-        </Button>
+    <section className="featured-products py-24" style={sectionStyle}>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div>
+            <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4">
+              {section.title}
+            </h2>
+            {section.description ? (
+              <p className="text-lg max-w-xl" style={{ color: mutedTextColor }}>
+                {section.description}
+              </p>
+            ) : null}
+          </div>
+          {section.cta ? (
+            <Button
+              variant={section.cta.variant ?? "outline"}
+              className="h-14 px-8 rounded-2xl group border-2 transition-all"
+              style={{ borderColor }}
+              asChild
+            >
+              <Link
+                href={resolveHref(section.cta.href)}
+                className="flex items-center font-bold gap-2"
+              >
+                {section.cta.label}
+                <span className="text-xl">→</span>
+              </Link>
+            </Button>
+          ) : null}
+        </div>
+        <div className="relative group/carousel">
+          <Suspense fallback={<CarouselSkeleton />}>
+            <FeaturedProducts
+              basePath={basePath}
+              locale={locale}
+              country={country}
+              currency={currency}
+            />
+          </Suspense>
+        </div>
       </div>
-      <Suspense fallback={<CarouselSkeleton />}>
-        <FeaturedProducts
-          basePath={basePath}
-          locale={locale}
-          country={country}
-          currency={currency}
-        />
-      </Suspense>
     </section>
   );
 }

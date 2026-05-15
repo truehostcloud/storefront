@@ -6,6 +6,7 @@ const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["shop.lvh.me", "*.trycloudflare.com"],
+  output: "standalone",
   env: {
     NEXT_PUBLIC_SENTRY_DSN: process.env.SENTRY_DSN || "",
   },
@@ -22,6 +23,7 @@ const nextConfig: NextConfig = {
     root: __dirname,
   },
   cacheComponents: true,
+  // cacheComponents: process.env.NODE_ENV === "production",
   cacheLife: {
     tenMinutes: {
       stale: 300, // 5 minutes client stale window
@@ -54,6 +56,20 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "**.trycloudflare.com",
         pathname: "/rails/active_storage/**",
+      },
+      {
+        protocol: "https",
+        hostname: "olitt.store",
+        pathname: "/rails/active_storage/**",
+      },
+      {
+        protocol: "https",
+        hostname: "**.olitt.store",
+        pathname: "/rails/active_storage/**",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
       },
     ],
   },

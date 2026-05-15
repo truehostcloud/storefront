@@ -2,36 +2,58 @@
 
 import type { Market } from "@spree/sdk";
 import { cacheLife, cacheTag } from "next/cache";
-import { getClient, getLocaleOptions } from "@/lib/spree";
+import {
+  getClientForConfig,
+  getLocaleOptions,
+  getSpreeCacheScope,
+  resolveSpreeConfig,
+} from "@/lib/spree";
 
-async function cachedListMarkets(options: {
-  locale?: string;
-  country?: string;
-}) {
+async function cachedListMarkets(
+  options: {
+    locale?: string;
+    country?: string;
+  },
+  baseUrl: string,
+  publishableKey: string,
+  _spreeScope: string,
+) {
   "use cache: remote";
   cacheLife("hours");
   cacheTag("markets");
-  return getClient().markets.list(options);
+  return getClientForConfig({ baseUrl, publishableKey }).markets.list(options);
 }
 
 async function cachedResolveMarket(
   country: string,
   options: { locale?: string; country?: string },
+  baseUrl: string,
+  publishableKey: string,
+  _spreeScope: string,
 ) {
   "use cache: remote";
   cacheLife("hours");
   cacheTag("resolved-market");
-  return getClient().markets.resolve(country, options);
+  return getClientForConfig({ baseUrl, publishableKey }).markets.resolve(
+    country,
+    options,
+  );
 }
 
 async function cachedListMarketCountries(
   marketId: string,
   options: { locale?: string; country?: string },
+  baseUrl: string,
+  publishableKey: string,
+  _spreeScope: string,
 ) {
   "use cache: remote";
   cacheLife("hours");
   cacheTag("market-countries");
-  return getClient().markets.countries.list(marketId, options);
+  return getClientForConfig({ baseUrl, publishableKey }).markets.countries.list(
+    marketId,
+    options,
+  );
 }
 
 export async function getMarkets(options?: {
@@ -39,17 +61,38 @@ export async function getMarkets(options?: {
   country?: string;
 }): Promise<{ data: Market[] }> {
   const resolvedOptions = options ?? (await getLocaleOptions());
-  return cachedListMarkets(resolvedOptions);
+  const spreeConfig = await resolveSpreeConfig();
+  const spreeScope = getSpreeCacheScope(spreeConfig);
+  return cachedListMarkets(
+    resolvedOptions,
+    spreeConfig.baseUrl,
+    spreeConfig.publishableKey,
+    spreeScope,
+  );
 }
 
 export async function resolveMarket(country: string) {
   const options = await getLocaleOptions();
-  return cachedResolveMarket(country, options);
+  const spreeConfig = await resolveSpreeConfig();
+  return cachedResolveMarket(
+    country,
+    options,
+    spreeConfig.baseUrl,
+    spreeConfig.publishableKey,
+    getSpreeCacheScope(spreeConfig),
+  );
 }
 
 export async function getMarketCountries(marketId: string) {
   const options = await getLocaleOptions();
-  return cachedListMarketCountries(marketId, options);
+  const spreeConfig = await resolveSpreeConfig();
+  return cachedListMarketCountries(
+    marketId,
+    options,
+    spreeConfig.baseUrl,
+    spreeConfig.publishableKey,
+    getSpreeCacheScope(spreeConfig),
+  );
 }
 
 /**

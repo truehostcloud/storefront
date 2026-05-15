@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { getConfig } from "./config";
+import { resolveSpreeConfig } from "./config";
 
 const DEFAULT_COUNTRY_COOKIE = "spree_country";
 const DEFAULT_LOCALE_COOKIE = "spree_locale";
@@ -12,7 +12,7 @@ export async function getLocaleOptions(): Promise<{
   locale?: string;
   country?: string;
 }> {
-  const config = getConfig();
+  const config = await resolveSpreeConfig();
 
   try {
     const cookieStore = await cookies();

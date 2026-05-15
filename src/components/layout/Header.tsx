@@ -8,6 +8,8 @@ import { CartButton } from "@/components/layout/CartButton";
 import { SearchToggle } from "@/components/layout/SearchToggle";
 import { Button } from "@/components/ui/button";
 import { getStoreName } from "@/lib/store";
+import type { TenantConfig } from "@/lib/tenant";
+import { resolveTenantBranding, resolveTenantNavigation } from "@/lib/tenant";
 
 const LazyMobileMenu = dynamic(
   () =>
@@ -35,20 +37,25 @@ const LazyCountrySwitcher = dynamic(
   },
 );
 
-const storeName = getStoreName();
-
 interface HeaderProps {
   rootCategories: Category[];
   basePath: string;
   locale: Locale;
+  tenantConfig?: TenantConfig | null;
 }
 
 export async function Header({
   rootCategories,
   basePath,
   locale,
+  tenantConfig,
 }: HeaderProps) {
   const t = await getTranslations({ locale, namespace: "header" });
+  const branding = resolveTenantBranding(tenantConfig, {
+    name: getStoreName(),
+    logoUrl: "/spree.png",
+  });
+  const navigation = resolveTenantNavigation(tenantConfig);
 
   return (
     <SearchToggle
@@ -59,8 +66,8 @@ export async function Header({
       center={
         <Link href={basePath || "/"} className="flex items-center min-w-0">
           <Image
-            src="/spree.png"
-            alt={storeName}
+            src={branding.logoUrl ?? "/spree.png"}
+            alt={branding.name ?? getStoreName()}
             width={90}
             height={32}
             className="max-w-full object-contain"
@@ -71,8 +78,26 @@ export async function Header({
         </Link>
       }
       rightStart={
-        <div className="hidden lg:block">
-          <LazyCountrySwitcher />
+        <div className="hidden lg:flex items-center gap-4">
+          {navigation.headerLinks.length > 0 && (
+            <nav
+              aria-label="Tenant navigation"
+              className="hidden xl:flex gap-4 text-sm"
+            >
+              {navigation.headerLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="hover:underline"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          )}
+          <div className="hidden lg:block">
+            <LazyCountrySwitcher />
+          </div>
         </div>
       }
       rightEnd={
