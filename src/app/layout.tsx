@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Suspense } from "react";
 
-import { CartProvider, CartProviderFallback } from "@/contexts/CartContext";
+import { CartProvider } from "@/contexts/CartContext";
 import { getStoreDescription, getStoreName } from "@/lib/store";
 
 import "./globals.css";
@@ -57,9 +57,7 @@ export default async function RootLayout({
         className={`${geist.variable} antialiased min-h-screen flex flex-col`}
         suppressHydrationWarning
       >
-        <Suspense
-          fallback={<CartProviderFallback>{children}</CartProviderFallback>}
-        >
+        <Suspense fallback={<div className="min-h-screen" />}>
           <CartProvider>{children}</CartProvider>
         </Suspense>
         <Analytics />
