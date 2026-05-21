@@ -7,6 +7,6 @@ describe("Locale loading state", () => {
   it("renders a static fallback without tenant lookup", () => {
     render(<Loading />);
 
-    expect(screen.getByText("Loading storefront")).toBeInTheDocument();
+    expect(screen.getByText("Loading Store")).toBeInTheDocument();
   });
 });
