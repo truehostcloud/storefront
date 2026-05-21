@@ -154,6 +154,30 @@ function collectPaymentKeys(
   return result;
 }
 
+function normalizeLocalDevSpreeApiUrl(apiUrl: string): string {
+  if (process.env.NODE_ENV !== "development") {
+    return apiUrl;
+  }
+
+  const overrideUrl = process.env.SPREE_API_DEV_URL?.trim();
+  if (overrideUrl) {
+    try {
+      return new URL(overrideUrl).origin;
+    } catch {
+      return overrideUrl;
+    }
+  }
+
+  try {
+    const url = new URL(apiUrl);
+    url.protocol = "http:";
+    url.port = "5000";
+    return url.origin;
+  } catch {
+    return apiUrl;
+  }
+}
+
 function collectPublicPaymentKeys(
   config: TenantConfig,
 ): PublicTenantPaymentKeys {
@@ -169,7 +193,9 @@ function getSpreeConfig(record: Record<string, unknown>): {
   apiUrl: string;
   publishableKey: string;
 } {
-  const apiUrl = pickString(record, ["spreeApiUrl"]) ?? "";
+  const apiUrl = normalizeLocalDevSpreeApiUrl(
+    pickString(record, ["spreeApiUrl"]) ?? "",
+  );
   const publishableKey = pickString(record, ["spreePublishableKey"]) ?? "";
 
   return { apiUrl, publishableKey };

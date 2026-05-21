@@ -90,6 +90,16 @@ function resolvePropertyPath(target: unknown, path: PropertyKey[]) {
   return { parent, current };
 }
 
+function formatOperationPath(path: PropertyKey[]): string {
+  return path
+    .map((key) =>
+      typeof key === "symbol"
+        ? (key.description ?? key.toString())
+        : String(key),
+    )
+    .join(".");
+}
+
 function createClientProxy(path: PropertyKey[] = []): Client {
   const proxyTarget = (() => undefined) as unknown as Client;
 
@@ -105,12 +115,34 @@ function createClientProxy(path: PropertyKey[] = []): Client {
       return (async () => {
         const client = await resolveClient();
         const { parent, current } = resolvePropertyPath(client, path);
+        const operation = formatOperationPath(path);
 
         if (typeof current !== "function") {
           return current;
         }
 
-        return current.apply(parent, args);
+        console.info("Calling Spree API", {
+          operation,
+          args,
+        });
+
+        try {
+          const response = await current.apply(parent, args);
+
+          console.info("Spree API response", {
+            operation,
+            response,
+          });
+
+          return response;
+        } catch (error) {
+          console.info("Spree API error", {
+            operation,
+            error,
+          });
+
+          throw error;
+        }
       })();
     },
   }) as Client;

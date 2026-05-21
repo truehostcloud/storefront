@@ -72,10 +72,62 @@ export interface HomepageFeaturedProductsSectionConfig {
   theme?: HomepageThemeConfig;
 }
 
+export interface HomepageCollectionItemConfig {
+  title?: string;
+  description?: string;
+  href?: string;
+  categoryPermalink?: string;
+}
+
+export interface HomepageFeaturedCollectionsSectionConfig {
+  type: "featured-collections";
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  items?: HomepageCollectionItemConfig[];
+  maxItems?: number;
+  cta?: HomepageButtonConfig;
+  theme?: HomepageThemeConfig;
+}
+
+export interface HomepageFaqItemConfig {
+  question: string;
+  answer: string;
+}
+
+export interface HomepageFaqSectionConfig {
+  type: "faq";
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  items: HomepageFaqItemConfig[];
+  theme?: HomepageThemeConfig;
+}
+
+export interface HomepageTestimonialItemConfig {
+  quote: string;
+  author: string;
+  role?: string;
+  company?: string;
+  rating?: 1 | 2 | 3 | 4 | 5;
+}
+
+export interface HomepageTestimonialsSectionConfig {
+  type: "testimonials";
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  items: HomepageTestimonialItemConfig[];
+  theme?: HomepageThemeConfig;
+}
+
 export type HomepageSectionConfig =
   | HomepageHeroSectionConfig
   | HomepageFeaturesSectionConfig
-  | HomepageFeaturedProductsSectionConfig;
+  | HomepageFeaturedProductsSectionConfig
+  | HomepageFeaturedCollectionsSectionConfig
+  | HomepageFaqSectionConfig
+  | HomepageTestimonialsSectionConfig;
 
 export interface HomepageConfig {
   version: 1;

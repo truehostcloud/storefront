@@ -19,6 +19,22 @@ function getArray(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
 }
 
+function getLinks(value: unknown): TenantLink[] {
+  const record = getRecord(value);
+  const entries = record ? getArray(record.links) : getArray(value);
+
+  return entries
+    .map((entry) => {
+      const record = getRecord(entry);
+      if (!record) return null;
+      const label = getString(record.label);
+      const href = getString(record.href);
+      if (!label || !href) return null;
+      return { label, href };
+    })
+    .filter((value): value is TenantLink => Boolean(value));
+}
+
 export function getTenantBrandName(
   config?: TenantSurfaceConfig | null,
 ): string | undefined {
@@ -111,17 +127,5 @@ export function getTenantSocialLinks(
 export function getTenantNavigationLinks(
   config?: TenantSurfaceConfig | null,
 ): TenantLink[] {
-  const navigation = getRecord(config?.navigation);
-  const links = getArray(navigation?.links);
-
-  return links
-    .map((entry) => {
-      const record = getRecord(entry);
-      if (!record) return null;
-      const label = getString(record.label);
-      const href = getString(record.href);
-      if (!label || !href) return null;
-      return { label, href };
-    })
-    .filter((value): value is TenantLink => Boolean(value));
+  return getLinks(config?.navigation);
 }

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactElement } from "react";
-import { FeaturedProductsSection } from "@/components/home/FeaturedProductsSection";
-import { FeaturesSection } from "@/components/home/FeaturesSection";
-import { HeroSection } from "@/components/home/HeroSection";
+import { PageSectionsRenderer } from "@/components/page-builder/PageSectionsRenderer";
 import { getMarkets, resolveCurrency } from "@/lib/data/markets";
 import { getHomepageConfig, getHomepageSections } from "@/lib/homepage";
 import { generateHomeMetadata } from "@/lib/metadata/home";
@@ -87,34 +85,13 @@ export default async function HomePage({
   const sections = getHomepageSections(homepageConfig);
 
   return (
-    <div className="flex flex-col gap-0">
-      {sections.map((section) => {
-        switch (section.type) {
-          case "hero":
-            return (
-              <HeroSection
-                key={section.type}
-                basePath={basePath}
-                section={section}
-              />
-            );
-          case "features":
-            return <FeaturesSection key={section.type} section={section} />;
-          case "featured-products":
-            return (
-              <FeaturedProductsSection
-                key={section.type}
-                basePath={basePath}
-                country={country}
-                currency={currency}
-                locale={locale}
-                section={section}
-              />
-            );
-          default:
-            return null;
-        }
-      })}
-    </div>
+    <PageSectionsRenderer
+      sections={sections}
+      basePath={basePath}
+      country={country}
+      currency={currency}
+      locale={locale}
+      keyPrefix="home"
+    />
   );
 }

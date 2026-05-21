@@ -40,7 +40,9 @@ function getLink(value: unknown): TenantLink | null {
 }
 
 function getLinks(value: unknown): TenantLink[] {
-  return getArray(value)
+  const entries = getRecord(value)?.links ?? value;
+
+  return getArray(entries)
     .map((entry) => getLink(entry))
     .filter((entry): entry is TenantLink => Boolean(entry));
 }
@@ -155,32 +157,32 @@ export function resolveTenantNavigation(
   defaults: Partial<TenantNavigationConfig> = {},
 ): TenantNavigationConfig {
   const raw = getRawConfig(config);
-  const layoutNavigation = getRecord(getLayoutConfig(config)?.navigation);
+  const layoutNavigation = getLayoutConfig(config)?.navigation;
   const navigation =
     getRecord(raw?.navigation) ?? getRecord(config?.navigation);
 
   const genericLinks = getFirstNonEmptyLinks(
-    layoutNavigation?.links,
+    layoutNavigation,
     navigation?.links,
     getTenantNavigationLinks(config),
   );
 
   const headerLinks = getFirstNonEmptyLinks(
-    layoutNavigation?.headerLinks,
+    layoutNavigation,
     navigation?.headerLinks,
     genericLinks,
     defaults.headerLinks,
   );
 
   const footerLinks = getFirstNonEmptyLinks(
-    layoutNavigation?.footerLinks,
+    layoutNavigation,
     navigation?.footerLinks,
     genericLinks,
     defaults.footerLinks,
   );
 
   const checkoutLinks = getFirstNonEmptyLinks(
-    layoutNavigation?.checkoutLinks,
+    layoutNavigation,
     navigation?.checkoutLinks,
     genericLinks,
     defaults.checkoutLinks,
@@ -200,6 +202,7 @@ export function resolveTenantFooter(
   return {
     description:
       getString(layoutFooter?.description) ||
+      getString(layoutFooter?.copy) ||
       getString(footer?.description) ||
       getTenantDescription(config) ||
       defaults.description,

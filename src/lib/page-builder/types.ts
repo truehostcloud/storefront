@@ -1,8 +1,11 @@
 import type {
   HomepageButtonConfig,
+  HomepageFaqSectionConfig,
+  HomepageFeaturedCollectionsSectionConfig,
   HomepageFeaturedProductsSectionConfig,
   HomepageFeaturesSectionConfig,
   HomepageHeroSectionConfig,
+  HomepageTestimonialsSectionConfig,
   HomepageThemeConfig,
 } from "@/lib/homepage";
 
@@ -38,6 +41,9 @@ export type DynamicPageSectionConfig =
   | HomepageHeroSectionConfig
   | HomepageFeaturesSectionConfig
   | HomepageFeaturedProductsSectionConfig
+  | HomepageFeaturedCollectionsSectionConfig
+  | HomepageFaqSectionConfig
+  | HomepageTestimonialsSectionConfig
   | DynamicPageRichTextSectionConfig
   | DynamicPageImageBannerSectionConfig;
 

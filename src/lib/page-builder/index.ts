@@ -59,8 +59,16 @@ function isDynamicPagesConfig(value: unknown): value is DynamicPagesConfig {
 function isDynamicPagesConfigLike(
   value: unknown,
 ): value is Partial<DynamicPagesConfig> {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  const hasDynamicPageKeys = "version" in value || "pages" in value;
+  if (!hasDynamicPageKeys) {
+    return false;
+  }
+
   return (
-    isRecord(value) &&
     (value.version === undefined || value.version === 1) &&
     (value.pages === undefined || Array.isArray(value.pages))
   );
@@ -77,7 +85,7 @@ function normalizeSlug(value: string | string[]): string {
 }
 
 function mergeObjects<T>(base: T, override: unknown): T {
-  if (!isRecord(base) || !isRecord(override)) {
+  if (!isRecord(base)) {
     return (override ?? base) as T;
   }
 
@@ -113,10 +121,6 @@ function extractDynamicPagesSource(source: unknown): unknown {
 
   if (isDynamicPagesConfigLike(source.dynamicPages)) {
     return source.dynamicPages;
-  }
-
-  if (Array.isArray(source.pages)) {
-    return { version: 1, pages: source.pages };
   }
 
   const design = source.design;
