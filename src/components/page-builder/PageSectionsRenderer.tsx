@@ -1,8 +1,11 @@
 import { FeaturedProductsSection } from "@/components/home/FeaturedProductsSection";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { HeroSection } from "@/components/home/HeroSection";
+import { FaqSection } from "@/components/page-builder/FaqSection";
+import { FeaturedCollectionsSection } from "@/components/page-builder/FeaturedCollectionsSection";
 import { ImageBannerSection } from "@/components/page-builder/ImageBannerSection";
 import { RichTextSection } from "@/components/page-builder/RichTextSection";
+import { TestimonialsSection } from "@/components/page-builder/TestimonialsSection";
 import type { DynamicPageSectionConfig } from "@/lib/page-builder";
 
 interface PageSectionsRendererProps {
@@ -45,6 +48,18 @@ export function PageSectionsRenderer({
                 section={section}
               />
             );
+          case "featured-collections":
+            return (
+              <FeaturedCollectionsSection
+                key={key}
+                basePath={basePath}
+                section={section}
+              />
+            );
+          case "faq":
+            return <FaqSection key={key} section={section} />;
+          case "testimonials":
+            return <TestimonialsSection key={key} section={section} />;
           case "rich-text":
             return (
               <RichTextSection

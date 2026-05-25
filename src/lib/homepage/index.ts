@@ -9,11 +9,23 @@ function isHomepageSection(value: unknown): value is HomepageSectionConfig {
   return isRecord(value) && typeof value.type === "string";
 }
 
+function isDefined<T>(value: T | null): value is T {
+  return value !== null;
+}
+
 function isHomepageConfigLike(
   value: unknown,
 ): value is Partial<HomepageConfig> {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  const hasHomepageKeys = "version" in value || "sections" in value;
+  if (!hasHomepageKeys) {
+    return false;
+  }
+
   return (
-    isRecord(value) &&
     (value.version === undefined || value.version === 1) &&
     (value.sections === undefined || Array.isArray(value.sections))
   );
@@ -75,6 +87,106 @@ function mergeObjects<T>(base: T, override: unknown): T {
   return result as T;
 }
 
+function getRecord(value: unknown): Record<string, unknown> | undefined {
+  return isRecord(value) ? value : undefined;
+}
+
+function getString(value: unknown): string | undefined {
+  return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+function getArray(value: unknown): unknown[] {
+  return Array.isArray(value) ? value : [];
+}
+
+function findHomepagePage(source: Record<string, unknown>): unknown {
+  const design = getRecord(source.design);
+  const layout = getRecord(design?.layout);
+  const pages = getArray(layout?.pages);
+
+  if (pages.length === 0) {
+    return undefined;
+  }
+
+  const homepage = pages.find((page) => {
+    if (!isRecord(page)) return false;
+
+    const slug = getString(page.slug)?.toLowerCase();
+    return (
+      page.is_homepage === true ||
+      slug === "index" ||
+      slug === "home" ||
+      slug === "homepage"
+    );
+  });
+
+  return homepage;
+}
+
+function cloneSection<T>(section: T): T {
+  return mergeObjects(section, {});
+}
+
+function buildHomepageSectionsFromSlugs(
+  slugs: unknown[],
+  defaultConfig: HomepageConfig,
+  source: Record<string, unknown>,
+): HomepageSectionConfig[] {
+  const heroSection = defaultConfig.sections.find(
+    (section) => section.type === "hero",
+  );
+  const featuresSection = defaultConfig.sections.find(
+    (section) => section.type === "features",
+  );
+  const featuredProductsSection = defaultConfig.sections.find(
+    (section) => section.type === "featured-products",
+  );
+
+  const pageTitle = getString(source.title);
+  const pageSummary = getString(source.summary);
+  const heroTitle =
+    pageTitle &&
+    !["home", "homepage", "index"].includes(pageTitle.toLowerCase())
+      ? pageTitle
+      : heroSection?.title;
+
+  const sections = slugs
+    .map((slug) => getString(slug)?.toLowerCase())
+    .filter((slug): slug is string => Boolean(slug))
+    .map((slug) => {
+      switch (slug) {
+        case "hero":
+          return heroSection
+            ? {
+                ...cloneSection(heroSection),
+                title: heroTitle ?? heroSection.title,
+                description: pageSummary || heroSection.description,
+              }
+            : null;
+        case "highlights":
+        case "features":
+          return featuresSection ? cloneSection(featuresSection) : null;
+        case "trust":
+          return featuresSection
+            ? {
+                ...cloneSection(featuresSection),
+                title: "Trust at every step",
+              }
+            : null;
+        case "cta":
+        case "featured-products":
+          return featuredProductsSection
+            ? cloneSection(featuredProductsSection)
+            : null;
+        default:
+          return null;
+      }
+    })
+    .filter(isDefined);
+
+  return sections;
+}
+
 function mergeHomepageSections(
   baseSections: HomepageSectionConfig[],
   overrideSections: unknown,
@@ -123,7 +235,22 @@ function extractHomepageSource(source: unknown): unknown {
     return source;
   }
 
-  return layout.homepage;
+  const layoutHomepage = layout.homepage;
+  if (isHomepageConfigLike(layoutHomepage)) {
+    return layoutHomepage;
+  }
+
+  const pages = layout.pages;
+  if (Array.isArray(pages)) {
+    const homepagePage = findHomepagePage(source as Record<string, unknown>);
+    if (isRecord(homepagePage)) {
+      return homepagePage;
+    }
+
+    return pages[0];
+  }
+
+  return layoutHomepage;
 }
 
 export function getDefaultHomepageConfig(
@@ -137,6 +264,38 @@ export function getHomepageConfig(
   source?: unknown,
 ): HomepageConfig {
   const defaultConfig = getDefaultHomepageConfig(variables);
+
+  if (isRecord(source)) {
+    const homepagePage = findHomepagePage(source);
+    if (isRecord(homepagePage) && Array.isArray(homepagePage.sections)) {
+      const interpolatedPage = interpolateValue(homepagePage, variables);
+      const pageSource = isRecord(interpolatedPage)
+        ? interpolatedPage
+        : undefined;
+
+      if (pageSource) {
+        const pageSections = getArray(pageSource.sections);
+        const structuredSections = pageSections.filter(isHomepageSection);
+        const homepageSections =
+          structuredSections.length > 0
+            ? mergeHomepageSections(defaultConfig.sections, structuredSections)
+            : buildHomepageSectionsFromSlugs(
+                pageSections,
+                defaultConfig,
+                pageSource,
+              );
+
+        if (homepageSections.length > 0) {
+          return {
+            ...mergeObjects(defaultConfig, pageSource),
+            sections: homepageSections,
+            version: 1,
+          };
+        }
+      }
+    }
+  }
+
   const extractedSource = extractHomepageSource(source);
 
   if (!isHomepageConfigLike(extractedSource)) {
@@ -144,6 +303,32 @@ export function getHomepageConfig(
   }
 
   const overrideConfig = interpolateValue(extractedSource, variables);
+  const pageSource = isRecord(overrideConfig) ? overrideConfig : undefined;
+
+  if (pageSource && Array.isArray(pageSource.sections)) {
+    const sections = pageSource.sections.filter(isHomepageSection);
+    if (sections.length > 0) {
+      return {
+        ...mergeObjects(defaultConfig, overrideConfig),
+        sections: mergeHomepageSections(defaultConfig.sections, sections),
+        version: 1,
+      };
+    }
+
+    const homepageSections = buildHomepageSectionsFromSlugs(
+      pageSource.sections,
+      defaultConfig,
+      pageSource,
+    );
+
+    if (homepageSections.length > 0) {
+      return {
+        ...mergeObjects(defaultConfig, overrideConfig),
+        sections: homepageSections,
+        version: 1,
+      };
+    }
+  }
 
   return {
     ...mergeObjects(defaultConfig, overrideConfig),

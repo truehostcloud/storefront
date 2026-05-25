@@ -1,10 +1,14 @@
 import type { Category } from "@spree/sdk";
 import { headers } from "next/headers";
 import Link from "next/link";
+import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { getCategories } from "@/lib/data/categories";
-import { getTenantConfigByHost } from "@/lib/tenant";
+import {
+  getTenantConfigByHost,
+  resolveTenantAnnouncementBar,
+} from "@/lib/tenant";
 import { getRequestHost } from "@/lib/tenant/request";
 
 interface StorefrontLayoutProps {
@@ -44,6 +48,7 @@ export default async function StorefrontLayout({
   const requestHeaders = await headers();
   const tenantHost = getRequestHost(requestHeaders) ?? "localhost";
   const tenantConfig = await getTenantConfigByHost(tenantHost);
+  const announcementBar = resolveTenantAnnouncementBar(tenantConfig);
 
   const rootCategories = await getCategories({
     depth_eq: 0,
@@ -57,6 +62,12 @@ export default async function StorefrontLayout({
 
   return (
     <>
+      {announcementBar ? (
+        <AnnouncementBar
+          basePath={basePath}
+          announcementBar={announcementBar}
+        />
+      ) : null}
       <Header
         rootCategories={rootCategories}
         basePath={basePath}
