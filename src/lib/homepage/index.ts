@@ -9,6 +9,10 @@ function isHomepageSection(value: unknown): value is HomepageSectionConfig {
   return isRecord(value) && typeof value.type === "string";
 }
 
+function isDefined<T>(value: T | null): value is T {
+  return value !== null;
+}
+
 function isHomepageConfigLike(
   value: unknown,
 ): value is Partial<HomepageConfig> {
@@ -146,7 +150,7 @@ function buildHomepageSectionsFromSlugs(
       ? pageTitle
       : heroSection?.title;
 
-  return slugs
+  const sections = slugs
     .map((slug) => getString(slug)?.toLowerCase())
     .filter((slug): slug is string => Boolean(slug))
     .map((slug) => {
@@ -178,7 +182,9 @@ function buildHomepageSectionsFromSlugs(
           return null;
       }
     })
-    .filter((section): section is HomepageSectionConfig => Boolean(section));
+    .filter(isDefined);
+
+  return sections;
 }
 
 function mergeHomepageSections(

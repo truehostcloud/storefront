@@ -85,7 +85,7 @@ function normalizeSlug(value: string | string[]): string {
 }
 
 function mergeObjects<T>(base: T, override: unknown): T {
-  if (!isRecord(base)) {
+  if (!isRecord(base) || !isRecord(override)) {
     return (override ?? base) as T;
   }
 
