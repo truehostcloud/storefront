@@ -9,7 +9,6 @@ import {
 import type { TenantConfig } from "./types";
 
 const DEFAULT_CACHE_TTL = "tenMinutes";
-const useTenantCache = process.env.NODE_ENV === "production";
 
 type OlittMockEntry =
   | {
@@ -230,10 +229,6 @@ export async function resolveTenantConfigByHost(
   const normalizedHost =
     normalizeHost(host, { preservePort: true }) ?? normalizeHost(host);
   if (!normalizedHost) return null;
-
-  if (!useTenantCache) {
-    return fetchTenantConfigFromOlitt(normalizedHost);
-  }
 
   return cachedResolveTenantConfigByHost(normalizedHost);
 }
