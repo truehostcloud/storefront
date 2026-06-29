@@ -49,12 +49,17 @@ import {
   updateAddressField,
 } from "@/lib/utils/address";
 import { getCardIconType, getCardLabel } from "@/lib/utils/credit-card";
+import {
+  isMpesaMethod,
+  isValidKenyanPhone,
+  normalizeKenyanPhone,
+} from "@/lib/utils/mpesa";
 import { extractBasePath } from "@/lib/utils/path";
 import { resolveGatewayId } from "@/lib/utils/payment-gateway";
 
 export type PaymentCompleteResult =
   | { type: "session"; sessionId: string; sessionResult?: string }
-  | { type: "direct" };
+  | { type: "direct"; awaitConfirmation?: boolean };
 
 export interface PaymentSectionHandle {
   submit: () => Promise<{ error?: string }>;
@@ -141,6 +146,12 @@ export function PaymentSection({
   );
   const [useShippingForBilling, setUseShippingForBilling] =
     useState(initialUseShipping);
+
+  // Prefill from the shipping/billing phone so most customers just confirm.
+  const [mpesaPhone, setMpesaPhone] = useState<string>(
+    () => cart.shipping_address?.phone ?? cart.billing_address?.phone ?? "",
+  );
+  const [mpesaPhoneError, setMpesaPhoneError] = useState<string | null>(null);
 
   // ── Saved cards (session-based gateways only) ───────────────────────
   const [savedCards, setSavedCards] = useState<SpreeCreditCard[]>([]);
@@ -562,10 +573,21 @@ export function PaymentSection({
               return {};
             }
 
-            // Direct payment flow (Check, Cash on Delivery, etc.)
+            // Direct payment flow (Check, Cash on Delivery, M-Pesa, etc.)
+            let metadata: Record<string, unknown> | undefined;
+            if (isMpesaMethod(selectedMethod.type)) {
+              if (!isValidKenyanPhone(mpesaPhone)) {
+                setMpesaPhoneError(t("mpesaPhoneInvalid"));
+                setProcessing(false);
+                return { error: t("mpesaPhoneInvalid") };
+              }
+              metadata = { phone: normalizeKenyanPhone(mpesaPhone) };
+            }
+
             const paymentResult = await createDirectPayment(
               cart.id,
               selectedMethod.id,
+              metadata,
             );
             if (!paymentResult.success) {
               const msg = paymentResult.error || t("failedToCreatePayment");
@@ -574,7 +596,10 @@ export function PaymentSection({
               return { error: msg };
             }
 
-            await onPaymentComplete({ type: "direct" });
+            await onPaymentComplete({
+              type: "direct",
+              awaitConfirmation: isMpesaMethod(selectedMethod.type),
+            });
             return {};
           } catch {
             const msg = t("paymentError");
@@ -595,6 +620,7 @@ export function PaymentSection({
       selectedCardId,
       useShippingForBilling,
       billAddress,
+      mpesaPhone,
       onUpdateBillingAddress,
       onPaymentComplete,
       cart.id,
@@ -910,6 +936,46 @@ export function PaymentSection({
                           }
                         })()}
                     </>
+                  ) : isMpesaMethod(pm.type) ? (
+                    /* ── M-Pesa: explicit phone number ── */
+                    <div className="px-4 py-4">
+                      {pm.description && (
+                        <p className="text-sm text-gray-600 mb-2">
+                          {pm.description}
+                        </p>
+                      )}
+                      <label
+                        htmlFor="mpesa-phone"
+                        className="block text-sm font-medium text-gray-900 mb-1"
+                      >
+                        {t("mpesaPhoneLabel")}
+                      </label>
+                      <input
+                        id="mpesa-phone"
+                        type="tel"
+                        inputMode="tel"
+                        autoComplete="tel"
+                        value={mpesaPhone}
+                        onChange={(e) => {
+                          setMpesaPhone(e.target.value);
+                          if (mpesaPhoneError) setMpesaPhoneError(null);
+                        }}
+                        placeholder={t("mpesaPhonePlaceholder")}
+                        className={`w-full rounded-sm border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 ${
+                          mpesaPhoneError ? "border-red-300" : "border-gray-300"
+                        }`}
+                      />
+                      {mpesaPhoneError ? (
+                        <p className="mt-1 text-sm text-red-700 flex items-center gap-1.5">
+                          <CircleAlert className="h-4 w-4 flex-shrink-0" />
+                          {mpesaPhoneError}
+                        </p>
+                      ) : (
+                        <p className="mt-1 text-xs text-gray-500">
+                          {t("mpesaPhoneHint")}
+                        </p>
+                      )}
+                    </div>
                   ) : (
                     /* ── Direct/manual payment ── */
                     <div className="px-4 py-4">

@@ -452,6 +452,13 @@ function CheckoutPageContentInner({
           cacheCompletedOrder(currentOrder.id, completeResult.order);
         }
 
+        if (result.type === "direct" && result.awaitConfirmation) {
+          routerRef.current.push(
+            `${basePath}/awaiting-payment/${currentOrder.id}`,
+          );
+          return;
+        }
+
         routerRef.current.push(`${basePath}/order-placed/${currentOrder.id}`);
       } catch {
         setError(tRef.current("generalError"));

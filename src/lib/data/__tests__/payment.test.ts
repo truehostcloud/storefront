@@ -9,6 +9,12 @@ const mockClient = {
       create: vi.fn(),
       complete: vi.fn(),
     },
+    payments: {
+      create: vi.fn(),
+    },
+  },
+  orders: {
+    get: vi.fn(),
   },
 };
 
@@ -35,6 +41,8 @@ import {
   completeCheckoutPaymentSession,
   confirmPaymentAndCompleteCart,
   createCheckoutPaymentSession,
+  createDirectPayment,
+  getOrderPaymentStatus,
 } from "@/lib/data/payment";
 
 const mockSession = {
@@ -95,6 +103,102 @@ describe("payment server actions", () => {
       expect(result).toEqual({
         success: false,
         error: "Gateway unavailable",
+      });
+    });
+  });
+
+  describe("createDirectPayment", () => {
+    const mockPayment = { id: "pay-1", state: "checkout" };
+
+    it("sends only the payment method id when no metadata is given", async () => {
+      mockClient.carts.payments.create.mockResolvedValue(mockPayment);
+
+      const result = await createDirectPayment("cart-1", "pm-1");
+
+      expect(mockClient.carts.payments.create).toHaveBeenCalledWith(
+        "cart-1",
+        { payment_method_id: "pm-1" },
+        { spreeToken: "order-token-123", token: undefined },
+      );
+      expect(result).toEqual({ success: true, payment: mockPayment });
+    });
+
+    it("forwards the M-Pesa phone in the metadata bag", async () => {
+      mockClient.carts.payments.create.mockResolvedValue(mockPayment);
+
+      await createDirectPayment("cart-1", "pm-1", { phone: "254712345678" });
+
+      expect(mockClient.carts.payments.create).toHaveBeenCalledWith(
+        "cart-1",
+        {
+          payment_method_id: "pm-1",
+          metadata: { phone: "254712345678" },
+        },
+        { spreeToken: "order-token-123", token: undefined },
+      );
+    });
+
+    it("returns error on failure", async () => {
+      mockClient.carts.payments.create.mockRejectedValue(
+        new Error("Payment rejected"),
+      );
+
+      const result = await createDirectPayment("cart-1", "pm-1");
+
+      expect(result).toEqual({ success: false, error: "Payment rejected" });
+    });
+  });
+
+  describe("getOrderPaymentStatus", () => {
+    it("returns completed when a payment has completed", async () => {
+      mockClient.orders.get.mockResolvedValue({
+        payment_status: "balance_due",
+        payments: [{ status: "completed" }],
+      });
+
+      expect(await getOrderPaymentStatus("cart-1")).toEqual({
+        state: "completed",
+      });
+    });
+
+    it("returns completed when the order payment_status is paid", async () => {
+      mockClient.orders.get.mockResolvedValue({
+        payment_status: "paid",
+        payments: [{ status: "pending" }],
+      });
+
+      expect(await getOrderPaymentStatus("cart-1")).toEqual({
+        state: "completed",
+      });
+    });
+
+    it("returns failed when every payment failed", async () => {
+      mockClient.orders.get.mockResolvedValue({
+        payment_status: "balance_due",
+        payments: [{ status: "failed" }],
+      });
+
+      expect(await getOrderPaymentStatus("cart-1")).toEqual({
+        state: "failed",
+      });
+    });
+
+    it("returns pending while a payment is still pending", async () => {
+      mockClient.orders.get.mockResolvedValue({
+        payment_status: "balance_due",
+        payments: [{ status: "pending" }],
+      });
+
+      expect(await getOrderPaymentStatus("cart-1")).toEqual({
+        state: "pending",
+      });
+    });
+
+    it("returns pending when the order cannot be fetched", async () => {
+      mockClient.orders.get.mockRejectedValue(new Error("not found"));
+
+      expect(await getOrderPaymentStatus("cart-1")).toEqual({
+        state: "pending",
       });
     });
   });
