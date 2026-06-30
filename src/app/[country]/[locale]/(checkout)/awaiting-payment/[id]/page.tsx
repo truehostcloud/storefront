@@ -84,10 +84,10 @@ export default function AwaitingPaymentPage({
         </p>
         <button
           type="button"
-          onClick={() => router.replace(`${basePath}/order-placed/${cartId}`)}
+          onClick={() => router.replace(basePath || "/")}
           className="mt-2 rounded-sm bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-800"
         >
-          {t("mpesaCheckOrderStatus")}
+          {t("mpesaContinueShopping")}
         </button>
       </div>
     );
