@@ -38,7 +38,12 @@ export default function AwaitingPaymentPage({
 
     async function poll() {
       while (active) {
-        const { state } = await getOrderPaymentStatus(cartId);
+        let state: "pending" | "completed" | "failed" = "pending";
+        try {
+          ({ state } = await getOrderPaymentStatus(cartId));
+        } catch {
+          state = "pending";
+        }
         if (!active) return;
 
         if (state === "completed") {

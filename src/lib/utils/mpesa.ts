@@ -13,6 +13,9 @@ export function normalizeKenyanPhone(raw: string): string {
   if (/^[17]\d{8}$/.test(digits)) {
     return `254${digits}`;
   }
+  if (/^2540[17]\d{8}$/.test(digits)) {
+    return `254${digits.slice(4)}`;
+  }
   if (/^254[17]\d{8}$/.test(digits)) {
     return digits;
   }

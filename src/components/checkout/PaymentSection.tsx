@@ -976,6 +976,7 @@ export function PaymentSection({
                         type="tel"
                         inputMode="tel"
                         autoComplete="tel"
+                        aria-invalid={Boolean(mpesaPhoneError)}
                         value={mpesaPhone}
                         onChange={(e) => {
                           setMpesaPhone(e.target.value);
