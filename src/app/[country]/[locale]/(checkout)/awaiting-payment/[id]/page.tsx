@@ -4,6 +4,7 @@ import { CircleAlert, Loader2, Smartphone } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { use, useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { getOrderPaymentStatus } from "@/lib/data/payment";
 import { extractBasePath } from "@/lib/utils/path";
 
@@ -82,13 +83,13 @@ export default function AwaitingPaymentPage({
         <p className="text-sm text-gray-500 max-w-md">
           {t("mpesaTimeoutBody")}
         </p>
-        <button
+        <Button
           type="button"
           onClick={() => router.replace(basePath || "/")}
-          className="mt-2 rounded-sm bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-800"
+          className="mt-2"
         >
           {t("mpesaContinueShopping")}
-        </button>
+        </Button>
       </div>
     );
   }

@@ -36,6 +36,13 @@ import {
   type StripePaymentFormHandle,
 } from "@/components/checkout/StripePaymentForm";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCountryStates } from "@/hooks/useCountryStates";
 import { getCreditCards } from "@/lib/data/credit-cards";
@@ -965,38 +972,31 @@ export function PaymentSection({
                           {pm.description}
                         </p>
                       )}
-                      <label
-                        htmlFor="mpesa-phone"
-                        className="block text-sm font-medium text-gray-900 mb-1"
-                      >
-                        {t("mpesaPhoneLabel")}
-                      </label>
-                      <input
-                        id="mpesa-phone"
-                        type="tel"
-                        inputMode="tel"
-                        autoComplete="tel"
-                        aria-invalid={Boolean(mpesaPhoneError)}
-                        value={mpesaPhone}
-                        onChange={(e) => {
-                          setMpesaPhone(e.target.value);
-                          if (mpesaPhoneError) setMpesaPhoneError(null);
-                        }}
-                        placeholder={t("mpesaPhonePlaceholder")}
-                        className={`w-full rounded-sm border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 ${
-                          mpesaPhoneError ? "border-red-300" : "border-gray-300"
-                        }`}
-                      />
-                      {mpesaPhoneError ? (
-                        <p className="mt-1 text-sm text-red-700 flex items-center gap-1.5">
-                          <CircleAlert className="h-4 w-4 flex-shrink-0" />
-                          {mpesaPhoneError}
-                        </p>
-                      ) : (
-                        <p className="mt-1 text-xs text-gray-500">
-                          {t("mpesaPhoneHint")}
-                        </p>
-                      )}
+                      <Field data-invalid={Boolean(mpesaPhoneError)}>
+                        <FieldLabel htmlFor="mpesa-phone">
+                          {t("mpesaPhoneLabel")}
+                        </FieldLabel>
+                        <Input
+                          id="mpesa-phone"
+                          type="tel"
+                          inputMode="tel"
+                          autoComplete="tel"
+                          aria-invalid={Boolean(mpesaPhoneError)}
+                          value={mpesaPhone}
+                          onChange={(e) => {
+                            setMpesaPhone(e.target.value);
+                            if (mpesaPhoneError) setMpesaPhoneError(null);
+                          }}
+                          placeholder={t("mpesaPhonePlaceholder")}
+                        />
+                        {mpesaPhoneError ? (
+                          <FieldError>{mpesaPhoneError}</FieldError>
+                        ) : (
+                          <FieldDescription>
+                            {t("mpesaPhoneHint")}
+                          </FieldDescription>
+                        )}
+                      </Field>
                     </div>
                   ) : (
                     /* ── Direct/manual payment ── */
