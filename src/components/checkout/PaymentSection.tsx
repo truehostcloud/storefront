@@ -9,6 +9,7 @@ import type {
   State,
 } from "@spree/sdk";
 import { CircleAlert, CreditCard, Info, Loader2 } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import {
   type Ref,
@@ -732,6 +733,16 @@ export function PaymentSection({
                   } ${index > 0 ? "border-t" : ""}`}
                 >
                   <RadioGroupItem value={pm.id} />
+                  {isMpesaMethod(pm.type) && (
+                    <Image
+                      src="/payment-icons/mpesa.svg"
+                      alt="M-Pesa"
+                      width={110}
+                      height={20}
+                      unoptimized
+                      className="h-5 w-auto"
+                    />
+                  )}
                   <span className="text-sm font-medium text-gray-900">
                     {pm.name}
                   </span>
@@ -743,6 +754,16 @@ export function PaymentSection({
                 <div className="flex items-center justify-between px-4 py-3.5 bg-blue-50">
                   <div className="flex items-center gap-3">
                     <RadioGroupItem value={pm.id} />
+                    {isMpesaMethod(pm.type) && (
+                      <Image
+                        src="/payment-icons/mpesa.svg"
+                        alt="M-Pesa"
+                        width={110}
+                        height={20}
+                        unoptimized
+                        className="h-5 w-auto"
+                      />
+                    )}
                     <span className="text-sm font-medium text-gray-900">
                       {pm.name}
                     </span>
