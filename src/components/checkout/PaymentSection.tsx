@@ -9,6 +9,7 @@ import type {
   State,
 } from "@spree/sdk";
 import { CircleAlert, CreditCard, Info, Loader2 } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import {
   type Ref,
@@ -35,6 +36,13 @@ import {
   type StripePaymentFormHandle,
 } from "@/components/checkout/StripePaymentForm";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCountryStates } from "@/hooks/useCountryStates";
 import { getCreditCards } from "@/lib/data/credit-cards";
@@ -49,12 +57,17 @@ import {
   updateAddressField,
 } from "@/lib/utils/address";
 import { getCardIconType, getCardLabel } from "@/lib/utils/credit-card";
+import {
+  isMpesaMethod,
+  isValidKenyanPhone,
+  normalizeKenyanPhone,
+} from "@/lib/utils/mpesa";
 import { extractBasePath } from "@/lib/utils/path";
 import { resolveGatewayId } from "@/lib/utils/payment-gateway";
 
 export type PaymentCompleteResult =
   | { type: "session"; sessionId: string; sessionResult?: string }
-  | { type: "direct" };
+  | { type: "direct"; awaitConfirmation?: boolean };
 
 export interface PaymentSectionHandle {
   submit: () => Promise<{ error?: string }>;
@@ -141,6 +154,12 @@ export function PaymentSection({
   );
   const [useShippingForBilling, setUseShippingForBilling] =
     useState(initialUseShipping);
+
+  // Prefill from the shipping/billing phone so most customers just confirm.
+  const [mpesaPhone, setMpesaPhone] = useState<string>(
+    () => cart.shipping_address?.phone ?? cart.billing_address?.phone ?? "",
+  );
+  const [mpesaPhoneError, setMpesaPhoneError] = useState<string | null>(null);
 
   // ── Saved cards (session-based gateways only) ───────────────────────
   const [savedCards, setSavedCards] = useState<SpreeCreditCard[]>([]);
@@ -562,10 +581,21 @@ export function PaymentSection({
               return {};
             }
 
-            // Direct payment flow (Check, Cash on Delivery, etc.)
+            // Direct payment flow (Check, Cash on Delivery, M-Pesa, etc.)
+            let metadata: Record<string, unknown> | undefined;
+            if (isMpesaMethod(selectedMethod.type)) {
+              if (!isValidKenyanPhone(mpesaPhone)) {
+                setMpesaPhoneError(t("mpesaPhoneInvalid"));
+                setProcessing(false);
+                return { error: t("mpesaPhoneInvalid") };
+              }
+              metadata = { phone: normalizeKenyanPhone(mpesaPhone) };
+            }
+
             const paymentResult = await createDirectPayment(
               cart.id,
               selectedMethod.id,
+              metadata,
             );
             if (!paymentResult.success) {
               const msg = paymentResult.error || t("failedToCreatePayment");
@@ -574,7 +604,10 @@ export function PaymentSection({
               return { error: msg };
             }
 
-            await onPaymentComplete({ type: "direct" });
+            await onPaymentComplete({
+              type: "direct",
+              awaitConfirmation: isMpesaMethod(selectedMethod.type),
+            });
             return {};
           } catch {
             const msg = t("paymentError");
@@ -595,6 +628,7 @@ export function PaymentSection({
       selectedCardId,
       useShippingForBilling,
       billAddress,
+      mpesaPhone,
       onUpdateBillingAddress,
       onPaymentComplete,
       cart.id,
@@ -706,6 +740,16 @@ export function PaymentSection({
                   } ${index > 0 ? "border-t" : ""}`}
                 >
                   <RadioGroupItem value={pm.id} />
+                  {isMpesaMethod(pm.type) && (
+                    <Image
+                      src="/payment-icons/mpesa.svg"
+                      alt="M-Pesa"
+                      width={110}
+                      height={20}
+                      unoptimized
+                      className="h-5 w-auto"
+                    />
+                  )}
                   <span className="text-sm font-medium text-gray-900">
                     {pm.name}
                   </span>
@@ -717,6 +761,16 @@ export function PaymentSection({
                 <div className="flex items-center justify-between px-4 py-3.5 bg-blue-50">
                   <div className="flex items-center gap-3">
                     <RadioGroupItem value={pm.id} />
+                    {isMpesaMethod(pm.type) && (
+                      <Image
+                        src="/payment-icons/mpesa.svg"
+                        alt="M-Pesa"
+                        width={110}
+                        height={20}
+                        unoptimized
+                        className="h-5 w-auto"
+                      />
+                    )}
                     <span className="text-sm font-medium text-gray-900">
                       {pm.name}
                     </span>
@@ -910,6 +964,40 @@ export function PaymentSection({
                           }
                         })()}
                     </>
+                  ) : isMpesaMethod(pm.type) ? (
+                    /* ── M-Pesa: explicit phone number ── */
+                    <div className="px-4 py-4">
+                      {pm.description && (
+                        <p className="text-sm text-gray-600 mb-2">
+                          {pm.description}
+                        </p>
+                      )}
+                      <Field data-invalid={Boolean(mpesaPhoneError)}>
+                        <FieldLabel htmlFor="mpesa-phone">
+                          {t("mpesaPhoneLabel")}
+                        </FieldLabel>
+                        <Input
+                          id="mpesa-phone"
+                          type="tel"
+                          inputMode="tel"
+                          autoComplete="tel"
+                          aria-invalid={Boolean(mpesaPhoneError)}
+                          value={mpesaPhone}
+                          onChange={(e) => {
+                            setMpesaPhone(e.target.value);
+                            if (mpesaPhoneError) setMpesaPhoneError(null);
+                          }}
+                          placeholder={t("mpesaPhonePlaceholder")}
+                        />
+                        {mpesaPhoneError ? (
+                          <FieldError>{mpesaPhoneError}</FieldError>
+                        ) : (
+                          <FieldDescription>
+                            {t("mpesaPhoneHint")}
+                          </FieldDescription>
+                        )}
+                      </Field>
+                    </div>
                   ) : (
                     /* ── Direct/manual payment ── */
                     <div className="px-4 py-4">
