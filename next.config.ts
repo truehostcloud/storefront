@@ -43,6 +43,12 @@ const nextConfig: NextConfig = {
         pathname: "/rails/active_storage/**",
       },
       {
+        protocol: "http",
+        hostname: "127.0.0.1",
+        port: "9000",
+        pathname: "/media/**",
+      },
+      {
         protocol: "https",
         hostname: "**.vendo.dev",
         pathname: "/rails/active_storage/**",

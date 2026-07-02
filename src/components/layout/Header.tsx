@@ -53,7 +53,7 @@ export async function Header({
   const t = await getTranslations({ locale, namespace: "header" });
   const branding = resolveTenantBranding(tenantConfig, {
     name: getStoreName(),
-    logoUrl: "/spree.png",
+    logoUrl: "/olitt-logo.svg",
   });
   const navigation = resolveTenantNavigation(tenantConfig);
 
@@ -66,7 +66,7 @@ export async function Header({
       center={
         <Link href={basePath || "/"} className="flex items-center min-w-0">
           <Image
-            src={branding.logoUrl ?? "/spree.png"}
+            src={branding.logoUrl ?? "/olitt-logo.svg"}
             alt={branding.name ?? getStoreName()}
             width={90}
             height={32}
