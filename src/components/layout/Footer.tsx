@@ -159,13 +159,13 @@ export async function Footer({
           <p>
             &copy; {new Date().getFullYear()} {branding.name}. {t("poweredBy")}
             <Link
-              href="https://spreecommerce.org"
+              href="https://olitt.com"
               target="_blank"
               className="text-neutral-400 hover:text-neutral-200 underline transition-colors"
             >
-              Spree Commerce
-            </Link>{" "}
-            & Next.js.
+              OLITT
+            </Link>
+            .
           </p>
         </div>
       </div>
