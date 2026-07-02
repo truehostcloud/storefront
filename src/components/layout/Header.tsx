@@ -71,7 +71,7 @@ export async function Header({
             width={90}
             height={32}
             className="max-w-full object-contain"
-            style={{ width: "auto", height: "auto" }}
+            style={{ width: "auto", height: "32px" }}
             fetchPriority="high"
             loading="eager"
           />
