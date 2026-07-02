@@ -117,10 +117,6 @@ function extractHomepageSource(source: unknown): unknown {
     }
   }
 
-  if (isHomepageConfigLike(source)) {
-    return source;
-  }
-
   return source;
 }
 
