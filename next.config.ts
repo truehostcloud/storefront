@@ -77,6 +77,16 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "**.olitt.com",
+        pathname: "/media/**",
+      },
+      {
+        protocol: "https",
+        hostname: "**.olitt.net",
+        pathname: "/media/**",
+      },
+      {
+        protocol: "https",
         hostname: "images.unsplash.com",
       },
     ],
