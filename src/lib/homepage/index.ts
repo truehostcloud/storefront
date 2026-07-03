@@ -104,26 +104,20 @@ function extractHomepageSource(source: unknown): unknown {
     return source;
   }
 
-  if (isHomepageConfigLike(source)) {
-    return source;
-  }
-
   const homepage = source.homepage;
   if (isHomepageConfigLike(homepage)) {
     return homepage;
   }
 
   const design = source.design;
-  if (!isRecord(design)) {
-    return source;
+  if (isRecord(design) && isRecord(design.layout)) {
+    const layoutHomepage = design.layout.homepage;
+    if (isRecord(layoutHomepage)) {
+      return layoutHomepage;
+    }
   }
 
-  const layout = design.layout;
-  if (!isRecord(layout)) {
-    return source;
-  }
-
-  return layout.homepage;
+  return source;
 }
 
 export function getDefaultHomepageConfig(

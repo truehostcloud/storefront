@@ -30,23 +30,51 @@ export async function createCheckoutPaymentSession(
 
 /**
  * Creates a direct payment for non-session payment methods
- * (e.g. Check, Cash on Delivery, Bank Transfer).
+ * (e.g. Check, Cash on Delivery, Bank Transfer, M-Pesa).
  */
 export async function createDirectPayment(
   cartId: string,
   paymentMethodId: string,
+  metadata?: Record<string, unknown>,
 ) {
   return actionResult(async () => {
     const options = await getCartOptions();
     const id = await requireCartId();
     const payment = await getClient().carts.payments.create(
       id,
-      { payment_method_id: paymentMethodId },
+      {
+        payment_method_id: paymentMethodId,
+        ...(metadata && { metadata }),
+      },
       options,
     );
     updateTag("checkout");
     return { payment };
   }, "Failed to create payment");
+}
+
+export async function getOrderPaymentStatus(
+  cartId: string,
+): Promise<{ state: "pending" | "completed" | "failed" }> {
+  const order = await getOrder(cartId).catch(() => null);
+  if (!order) return { state: "pending" };
+
+  const payments = order.payments ?? [];
+  if (
+    order.payment_status === "paid" ||
+    payments.some((payment) => payment.status === "completed")
+  ) {
+    return { state: "completed" };
+  }
+  if (
+    payments.length > 0 &&
+    payments.every(
+      (payment) => payment.status === "failed" || payment.status === "invalid",
+    )
+  ) {
+    return { state: "failed" };
+  }
+  return { state: "pending" };
 }
 
 export async function completeCheckoutPaymentSession(

@@ -33,6 +33,8 @@ const nextConfig: NextConfig = {
   },
   images: {
     qualities: [25, 50, 75, 85, 100],
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     dangerouslyAllowLocalIP: true, // Allow localhost images in development
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
@@ -41,6 +43,12 @@ const nextConfig: NextConfig = {
         protocol: "http",
         hostname: "localhost",
         pathname: "/rails/active_storage/**",
+      },
+      {
+        protocol: "http",
+        hostname: "127.0.0.1",
+        port: "9000",
+        pathname: "/media/**",
       },
       {
         protocol: "https",
@@ -66,6 +74,16 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "**.olitt.store",
         pathname: "/rails/active_storage/**",
+      },
+      {
+        protocol: "https",
+        hostname: "**.olitt.com",
+        pathname: "/media/**",
+      },
+      {
+        protocol: "https",
+        hostname: "**.olitt.net",
+        pathname: "/media/**",
       },
       {
         protocol: "https",
