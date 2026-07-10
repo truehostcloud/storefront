@@ -1,10 +1,10 @@
 import Link from "next/link";
-import type { CSSProperties } from "react";
 import { Suspense } from "react";
 import { FeaturedProducts } from "@/components/products/FeaturedProducts";
 import { ProductCardSkeleton } from "@/components/products/ProductCardSkeleton";
 import { Button } from "@/components/ui/button";
 import type { HomepageFeaturedProductsSectionConfig } from "@/lib/homepage";
+import { buildSectionThemeVars } from "@/lib/homepage/section-theme";
 
 function CarouselSkeleton() {
   return (
@@ -18,24 +18,17 @@ function CarouselSkeleton() {
 
 interface FeaturedProductsSectionProps {
   basePath: string;
-  locale: string;
-  country: string;
   currency?: string;
   section: HomepageFeaturedProductsSectionConfig;
 }
 
 export async function FeaturedProductsSection({
   basePath,
-  locale,
-  country,
   currency,
   section,
 }: FeaturedProductsSectionProps) {
   const theme = section.theme ?? {};
-  const sectionStyle: CSSProperties = {
-    backgroundColor: theme.background,
-    color: theme.foreground,
-  };
+  const sectionStyle = buildSectionThemeVars(theme);
   const mutedTextColor = theme.mutedForeground ?? "#64748b";
   const borderColor = theme.borderColor ?? "#cbd5e1";
 
@@ -79,12 +72,7 @@ export async function FeaturedProductsSection({
         </div>
         <div className="relative group/carousel">
           <Suspense fallback={<CarouselSkeleton />}>
-            <FeaturedProducts
-              basePath={basePath}
-              locale={locale}
-              country={country}
-              currency={currency}
-            />
+            <FeaturedProducts basePath={basePath} currency={currency} />
           </Suspense>
         </div>
       </div>

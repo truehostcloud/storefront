@@ -86,8 +86,6 @@ async function CheckoutDataLoader({ params }: CheckoutPageProps) {
         <PageSectionsRenderer
           sections={pageSlots.checkoutPage.beforeMain}
           basePath={basePath}
-          locale={locale}
-          country={urlCountry}
           currency={currency}
           keyPrefix="checkout-before"
         />
@@ -101,8 +99,6 @@ async function CheckoutDataLoader({ params }: CheckoutPageProps) {
         <PageSectionsRenderer
           sections={pageSlots.checkoutPage.afterMain}
           basePath={basePath}
-          locale={locale}
-          country={urlCountry}
           currency={currency}
           keyPrefix="checkout-after"
         />

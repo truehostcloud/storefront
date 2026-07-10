@@ -8,8 +8,6 @@ import type { DynamicPageSectionConfig } from "@/lib/page-builder";
 interface PageSectionsRendererProps {
   sections: DynamicPageSectionConfig[];
   basePath: string;
-  locale: string;
-  country: string;
   currency?: string;
   keyPrefix?: string;
 }
@@ -17,8 +15,6 @@ interface PageSectionsRendererProps {
 export function PageSectionsRenderer({
   sections,
   basePath,
-  locale,
-  country,
   currency,
   keyPrefix = "section",
 }: PageSectionsRendererProps) {
@@ -39,9 +35,7 @@ export function PageSectionsRenderer({
               <FeaturedProductsSection
                 key={key}
                 basePath={basePath}
-                country={country}
                 currency={currency}
-                locale={locale}
                 section={section}
               />
             );

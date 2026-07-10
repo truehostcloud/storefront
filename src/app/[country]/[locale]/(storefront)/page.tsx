@@ -105,9 +105,7 @@ export default async function HomePage({
               <FeaturedProductsSection
                 key={section.type}
                 basePath={basePath}
-                country={country}
                 currency={currency}
-                locale={locale}
                 section={section}
               />
             );

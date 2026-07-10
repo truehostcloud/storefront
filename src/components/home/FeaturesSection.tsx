@@ -1,6 +1,6 @@
 import { ShieldCheck, ShoppingBag, Sparkles, Truck } from "lucide-react";
-import type { CSSProperties } from "react";
 import type { HomepageFeaturesSectionConfig } from "@/lib/homepage";
+import { buildSectionThemeVars } from "@/lib/homepage/section-theme";
 
 interface FeaturesSectionProps {
   section: HomepageFeaturesSectionConfig;
@@ -21,10 +21,7 @@ function getFeatureIcon(iconName?: string) {
 
 export async function FeaturesSection({ section }: FeaturesSectionProps) {
   const theme = section.theme ?? {};
-  const sectionStyle: CSSProperties = {
-    backgroundColor: theme.background,
-    color: theme.foreground,
-  };
+  const sectionStyle = buildSectionThemeVars(theme);
   const mutedTextColor = theme.mutedForeground ?? "#6b7280";
   const cardBackground = theme.cardBackground ?? "#ffffff";
   const borderColor = theme.borderColor ?? "#e5e7eb";

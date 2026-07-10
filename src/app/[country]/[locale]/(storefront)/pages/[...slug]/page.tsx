@@ -58,12 +58,6 @@ export default async function DynamicStorePage({
   }
 
   return (
-    <DynamicPageRenderer
-      page={page}
-      basePath={basePath}
-      locale={locale}
-      country={country}
-      currency={currency}
-    />
+    <DynamicPageRenderer page={page} basePath={basePath} currency={currency} />
   );
 }

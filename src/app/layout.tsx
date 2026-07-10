@@ -35,6 +35,7 @@ export const metadata: Metadata = {
     default: rootStoreName,
   },
   description: getStoreDescription(),
+  icons: { icon: "/olitt-logo.svg" },
 };
 
 export default async function RootLayout({

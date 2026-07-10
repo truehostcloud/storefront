@@ -66,7 +66,7 @@ export const ProductCard = memo(function ProductCard({
       onClick={handleClick}
     >
       {/* Image */}
-      <div className="relative aspect-square bg-gray-100 rounded-md overflow-hidden">
+      <div className="relative aspect-square bg-muted rounded-md overflow-hidden">
         <ProductImage
           src={imageUrl}
           alt={product.name}
@@ -85,25 +85,27 @@ export const ProductCard = memo(function ProductCard({
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="text-sm font-medium text-gray-900 group-hover:text-primary transition-colors line-clamp-2">
+        <h3 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2">
           {product.name}
         </h3>
 
         <div className="mt-2 flex items-center gap-2">
           {displayPrice && (
-            <span className="text-lg font-semibold text-gray-900">
+            <span className="text-lg font-semibold text-foreground">
               {displayPrice}
             </span>
           )}
           {onSale && strikethroughPrice && (
-            <span className="text-sm text-gray-500 line-through">
+            <span className="text-sm text-muted-foreground line-through">
               {strikethroughPrice}
             </span>
           )}
         </div>
 
         {!product.purchasable && (
-          <span className="mt-2 text-sm text-gray-500">{t("outOfStock")}</span>
+          <span className="mt-2 text-sm text-muted-foreground">
+            {t("outOfStock")}
+          </span>
         )}
       </div>
     </Link>
