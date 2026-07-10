@@ -18,16 +18,12 @@ function CarouselSkeleton() {
 
 interface FeaturedProductsSectionProps {
   basePath: string;
-  locale: string;
-  country: string;
   currency?: string;
   section: HomepageFeaturedProductsSectionConfig;
 }
 
 export async function FeaturedProductsSection({
   basePath,
-  locale,
-  country,
   currency,
   section,
 }: FeaturedProductsSectionProps) {
@@ -79,12 +75,7 @@ export async function FeaturedProductsSection({
         </div>
         <div className="relative group/carousel">
           <Suspense fallback={<CarouselSkeleton />}>
-            <FeaturedProducts
-              basePath={basePath}
-              locale={locale}
-              country={country}
-              currency={currency}
-            />
+            <FeaturedProducts basePath={basePath} currency={currency} />
           </Suspense>
         </div>
       </div>

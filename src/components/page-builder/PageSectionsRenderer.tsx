@@ -17,8 +17,6 @@ interface PageSectionsRendererProps {
 export function PageSectionsRenderer({
   sections,
   basePath,
-  locale,
-  country,
   currency,
   keyPrefix = "section",
 }: PageSectionsRendererProps) {
@@ -39,9 +37,7 @@ export function PageSectionsRenderer({
               <FeaturedProductsSection
                 key={key}
                 basePath={basePath}
-                country={country}
                 currency={currency}
-                locale={locale}
                 section={section}
               />
             );

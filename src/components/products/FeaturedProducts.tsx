@@ -1,8 +1,7 @@
 import dynamic from "next/dynamic";
 import { ProductCardSkeleton } from "@/components/products/ProductCardSkeleton";
 import { PRODUCT_CARD_FIELDS } from "@/lib/data/cached";
-import { cachedListProducts } from "@/lib/data/products";
-import { getAccessToken } from "@/lib/spree";
+import { getProducts } from "@/lib/data/products";
 
 const LazyProductCarousel = dynamic(
   () =>
@@ -22,23 +21,17 @@ const LazyProductCarousel = dynamic(
 
 interface FeaturedProductsProps {
   basePath: string;
-  locale: string;
-  country: string;
   currency?: string;
 }
 
 export async function FeaturedProducts({
   basePath,
-  locale,
-  country,
   currency,
 }: FeaturedProductsProps) {
-  const userToken = await getAccessToken();
-  const productsResponse = await cachedListProducts(
-    { limit: 8, fields: PRODUCT_CARD_FIELDS },
-    { locale, country },
-    userToken,
-  );
+  const productsResponse = await getProducts({
+    limit: 10,
+    fields: PRODUCT_CARD_FIELDS,
+  });
 
   return (
     <LazyProductCarousel
