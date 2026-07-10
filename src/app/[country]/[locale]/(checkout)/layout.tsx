@@ -138,18 +138,9 @@ interface CheckoutLayoutProps {
 
 function CheckoutLayoutContent({ children }: CheckoutLayoutProps) {
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{
-        background: "var(--color-background)",
-        color: "var(--color-text)",
-      }}
-    >
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Mobile header */}
-      <div
-        className="lg:hidden border-b"
-        style={{ borderColor: "var(--color-border)" }}
-      >
+      <div className="lg:hidden border-b border-border">
         <div className="px-5">
           <CheckoutHeader />
         </div>
@@ -175,13 +166,7 @@ function CheckoutLayoutContent({ children }: CheckoutLayoutProps) {
         </div>
 
         {/* Desktop summary sidebar — Shopify: light gray bg with left border */}
-        <div
-          className="hidden lg:block lg:col-start-3 border-l"
-          style={{
-            borderColor: "var(--color-border)",
-            background: "var(--color-surface)",
-          }}
-        >
+        <div className="hidden lg:block lg:col-start-3 border-l border-border bg-muted">
           <div className="sticky top-0 px-10 py-10">
             <CheckoutSummary />
           </div>
