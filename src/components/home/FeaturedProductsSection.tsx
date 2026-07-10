@@ -1,10 +1,10 @@
 import Link from "next/link";
-import type { CSSProperties } from "react";
 import { Suspense } from "react";
 import { FeaturedProducts } from "@/components/products/FeaturedProducts";
 import { ProductCardSkeleton } from "@/components/products/ProductCardSkeleton";
 import { Button } from "@/components/ui/button";
 import type { HomepageFeaturedProductsSectionConfig } from "@/lib/homepage";
+import { buildSectionThemeVars } from "@/lib/homepage/section-theme";
 
 function CarouselSkeleton() {
   return (
@@ -28,10 +28,7 @@ export async function FeaturedProductsSection({
   section,
 }: FeaturedProductsSectionProps) {
   const theme = section.theme ?? {};
-  const sectionStyle: CSSProperties = {
-    backgroundColor: theme.background,
-    color: theme.foreground,
-  };
+  const sectionStyle = buildSectionThemeVars(theme);
   const mutedTextColor = theme.mutedForeground ?? "#64748b";
   const borderColor = theme.borderColor ?? "#cbd5e1";
 

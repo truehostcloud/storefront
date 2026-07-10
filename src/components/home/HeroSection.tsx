@@ -1,12 +1,12 @@
 import { ArrowRight, Play } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import type { CSSProperties } from "react";
 import { Button } from "@/components/ui/button";
 import type {
   HomepageActionIcon,
   HomepageHeroSectionConfig,
 } from "@/lib/homepage";
+import { buildSectionThemeVars } from "@/lib/homepage/section-theme";
 
 interface HeroSectionProps {
   basePath: string;
@@ -36,10 +36,7 @@ function getActionIcon(icon?: HomepageActionIcon) {
 
 export async function HeroSection({ basePath, section }: HeroSectionProps) {
   const theme = section.theme ?? {};
-  const sectionStyle: CSSProperties = {
-    backgroundColor: theme.background,
-    color: theme.foreground,
-  };
+  const sectionStyle = buildSectionThemeVars(theme);
   const mutedTextColor = theme.mutedForeground ?? "#6b7280";
   const cardBackground = theme.cardBackground ?? "#ffffff";
   const borderColor = theme.borderColor ?? "#e5e7eb";

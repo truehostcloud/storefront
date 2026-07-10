@@ -17,6 +17,7 @@ export interface HomepageThemeConfig {
   background?: string;
   foreground?: string;
   accent?: string;
+  accentForeground?: string;
   mutedForeground?: string;
   cardBackground?: string;
   borderColor?: string;
