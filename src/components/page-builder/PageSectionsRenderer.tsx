@@ -8,8 +8,6 @@ import type { DynamicPageSectionConfig } from "@/lib/page-builder";
 interface PageSectionsRendererProps {
   sections: DynamicPageSectionConfig[];
   basePath: string;
-  locale: string;
-  country: string;
   currency?: string;
   keyPrefix?: string;
 }

@@ -107,8 +107,6 @@ export default async function ProductPage({
         <PageSectionsRenderer
           sections={pageSlots.productPage.beforeMain}
           basePath={basePath}
-          locale={locale}
-          country={country}
           currency={currency}
           keyPrefix="product-before"
         />
@@ -118,8 +116,6 @@ export default async function ProductPage({
         <PageSectionsRenderer
           sections={pageSlots.productPage.afterMain}
           basePath={basePath}
-          locale={locale}
-          country={country}
           currency={currency}
           keyPrefix="product-after"
         />

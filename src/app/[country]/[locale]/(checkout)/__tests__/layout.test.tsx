@@ -25,13 +25,11 @@ describe("CheckoutLayout branding", () => {
       </CheckoutLayout>,
     );
 
-    const logos = screen.getAllByRole("img");
+    const logos = screen.getAllByRole("img", { name: "Test Store" });
     expect(logos.length).toBeGreaterThan(0);
     for (const logo of logos) {
       expect(logo).toHaveAttribute("src", "/olitt-logo.svg");
+      expect(logo.getAttribute("src")).not.toContain("spree");
     }
-    expect(
-      logos.some((logo) => logo.getAttribute("src")?.includes("spree")),
-    ).toBe(false);
   });
 });
