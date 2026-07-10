@@ -23,7 +23,7 @@ function CheckoutHeader() {
   const tenantConfig = useTenantConfig();
   const branding = resolveTenantBranding(tenantConfig, {
     name: tenantConfig.storeName ?? "Store",
-    logoUrl: "/spree.png",
+    logoUrl: "/olitt-logo.svg",
   });
   const navigation = resolveTenantNavigation(tenantConfig);
 
@@ -31,7 +31,7 @@ function CheckoutHeader() {
     <header className="flex items-center justify-between">
       <Link href={basePath || "/"} className="flex items-center space-x-2">
         <Image
-          src={branding.logoUrl ?? "/spree.png"}
+          src={branding.logoUrl ?? "/olitt-logo.svg"}
           alt={branding.name ?? tenantConfig.storeName ?? "Store"}
           width={90}
           height={32}
